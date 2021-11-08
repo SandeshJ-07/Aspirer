@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} Explore {% endblock %}
+
+{% block links %}
+<link rel="stylesheet" href="{% static 'css/explore.css' %}">
+{% endblock %}
+
+{% block content %}
+    <!-- Main -->
+
+    <main class="py-5 px-3 mt-4">
+        <h5 class="fw-bold">What Other's Today Looks Like</h5>
+        <div class="d-flex align-items-center shadow-sm mt-3 mb-5 p-2">
+            <div style="height:75px; width:75px;" class="bg-primary rounded-circle me-3 d-flex align-items-center justify-content-center pe-pointer">
+                <i class="bi bi-plus fs-1 text-white"></i>
+            </div>
+            <div>
+                <img src="https://www.pngkey.com/png/full/114-1149878_setting-user-avatar-in-specific-size-without-breaking.png" alt="avatar" class="rounded-circle border border-primary p-1 me-3 pe-pointer" width="75px">
+            </div>
+            <div>
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJbM1sKRHlT8AroSFkNAmAT4fCrvcBOqCUXX_e1YF45ZjkBnqYDKz7AmqZblmAlZALabY&usqp=CAU" alt="avatar" class="rounded-circle border border-primary p-1 me-3" width="75px">
+            </div>
+        </div>
+        <h5 class="mb-3 fw-bold">Based on What You Like</h5>
+        <div class="d-flex flex-wrap ">
+        {% for post in posts %}
+            <div class="my-2 explorePost">
+                <a href="{% url 'Aspirer:ViewPost' post.id %}" target="_blank"><img src="{{post.Showimage.url}}" alt="" class="my-2 exploreImg"></a>
+                <div class="d-flex align-items-center py-1 px-2 exploreDetails">
+                    <img src="{{post.profile.ProfileImg.url}}" alt="avatar" class="rounded-circle" width="25px">
+                    <a class="text-dark" href="{% url 'Aspirer:Profile' post.profile.username %}" target="_blank"><p class="my-0 ms-2 py-0">{{post.profile.username}}</p></a>
+                    <div class="ms-auto text-secondary">
+                        <i class="bi bi-heart-fill pe-pointer {% if request.user.id|stringformat:'i' in post.likes %} text-danger {% endif %}"></i>
+                        <i class="bi bi-bookmark-fill pe-pointer {% if post.id|stringformat:'i' in CProfile.saved  %} text-dark {% endif %} "></i>
+                    </div>
+                </div>
+            </div>  
+            {% endfor %}
+        </div>
+    </main>
+    <!-- Main -->
+
+    <script>
+    
+    </script>
+{% endblock %}

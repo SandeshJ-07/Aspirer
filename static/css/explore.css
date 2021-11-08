@@ -1,0 +1,38 @@
+.explorePost{
+    width:30%;
+    margin: 10px;
+}
+
+.exploreImg{
+    width:100%;
+}
+
+.exploreDetails{
+    display:flex;
+}
+
+@media(max-width:725px){
+    .explorePost{
+        width:45%;
+        margin:0 10px;
+    }
+    .exploreImg{
+        width:100%;
+    }
+}
+
+@media(max-width:575px){
+    .exploreDetails{
+        display:none !important;
+    }
+}
+
+@media(max-width:434px){
+    .explorePost{
+        width:40%;
+        margin:0 10px;
+    }
+    .exploreImg{
+        width:100%;
+    }
+}

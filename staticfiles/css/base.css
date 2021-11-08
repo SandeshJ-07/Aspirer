@@ -1,0 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&display=swap');
+
+:root{
+    --primary-background : #55acee;
+}
+
+*{
+    margin:0;
+    padding: 0;
+    font-family: 'Open Sans', sans-serif;
+}
+
+html, body{
+    overflow-x: hidden;
+}
+
+/* basic tags overwrite */
+a{
+    text-decoration: none;
+    color:black;
+}
+
+input{
+    font-weight: bold !important;
+}
+
+.nav-item{
+    margin:auto 2px;
+}
+
+.nav-item i{
+    font-size:20px;
+}
+/* basic tags overwrite */
+
+.font-1{
+    font-family: font-1;
+}
+
+.bg-yellow{
+    background-color: var(--primary-background);
+}
+
+.form-control{
+    font-size:14px;
+    border-radius: 0;
+    border:none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.275);
+}
+
+.form-control:active, .form-control:focus{
+    outline: none;
+    box-shadow: none;
+    border:none;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.275);
+}
+
+.pe-pointer{
+    cursor: pointer;
+}
+
+.dropdown-btn:active,
+.dropdown-btn:focus,
+.dropdown-btn:focus-visible{
+    outline: none !important;
+    box-shadow: none !important;
+    border:none !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.275);
+}
+
+.chatIcon{
+    display: block;
+}
+
+@media(max-width: 577px){
+    .chatIcon{
+        display: none;
+    }
+}
+
+@font-face {
+    font-family: font-1;
+    src: url(../vendors/font/Azonix.otf);
+}

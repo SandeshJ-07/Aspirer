@@ -1,0 +1,185 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% if act == "login" %} Sign In {% else %} Sign Up {% endif %} | Aspirer</title>
+  <link rel="shortcut icon" type="image" href="{% static 'images/Icon.png' %}" />
+  <!-- Bootstap -->
+  <link rel="stylesheet" href="{% static 'vendors/bootstrap-5.0.2-dist/css/bootstrap.min.css' %}" />
+  <script src="{% static 'vendors/bootstrap-5.0.2-dist/js/bootstrap.min.js' %}"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.6.1/font/bootstrap-icons.css" />
+  <!-- Bootstap -->
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{% static 'css/base.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/login.css' %}" />
+  <!-- Custom CSS -->
+</head>
+
+<body>
+  <section>
+
+    <div class="row">
+      
+      <!-- Create Account -->
+      <div class="col-lg-4 col-md-10 mx-auto col-sm-12 bg-white p-4 mx-5 my-4 rounded-3 {% if act == "login" %} d-none {% endif %} " id="createAcc">
+        <img src="{% static 'images/Logo.png' %}" class="w-25 mb-4 mx-auto  d-lg-none d-block" />
+        <h3 class="fw-bold mb-3">Create an account</h3>
+        <p class="fw-bold">Already have an account? <a class="text-primary pe-pointer" id="signInBtn"> Sign In</a></p>
+
+        <form method="POST" action="{% url 'Aspirer:SignUp' %}">
+         {% csrf_token %}
+          <div class="mt-5 mb-2">
+            <input type="text" class="form-control" id="Email" name="email"
+              placeholder="Phone Number, or Email address" />
+          </div>
+          <div class="d-flex">
+            <div class="mt-3 mb-2 me-3">
+              <input type="text" class="form-control" id="CreateName" placeholder="Full Name" name="fname" required />
+            </div>
+            <div class="mt-3 mb-2">
+              <input type="text" class="form-control" id="CreateUserName" placeholder="Username" name="username" onchange="checkUsername()" required/>
+            </div>
+          </div>
+          <div class="alert d-none alert-danger fs-6" id="usernameAlert" role="alert"> <i class="bi bi-exclamation-circle"></i> Username already taken ! </div>
+          <div class="mt-4 d-flex">
+            <input type="password" class="form-control" id="createPassword" placeholder="Password" name="password" required/>
+            <i class="bi bi-eye-slash ms-3 pe-pointer toggleCreatePassword"></i>
+          </div>
+          <button class="btn btn-primary my-4 ms-auto d-block rounded-3 btn-sm">
+            Sign Up
+          </button>
+        </form>
+        <div class=" d-flex flex-row align-items-center justify-content-center mt-3 ">
+          <hr class="w-50 mx-3" />
+          <p>OR</p>
+          <hr class="w-50 mx-3" />
+        </div>
+        <div class="otherMedias">
+          <button class="w-75 d-block mx-auto btn-light p-2 fw-bold my-3 rounded-3"> <img class="me-2" src="https://img.icons8.com/color/20/000000/google-logo.png"/>Continue with Google</button>
+          <button class="w-75 d-block mx-auto btn-primary p-2 fw-bold my-3 rounded-3"> <i class="bi bi-facebook text-white me-2"></i> Continue with Facebook</button>
+        </div>
+      </div>
+      <!-- Create Account -->
+
+      <!-- Logo  -->
+      <div class=" col-lg-7 loginSec justify-content-center align-items-center d-none d-lg-flex">
+        <img src="{% static 'images/MainLogoBlackBg.png' %}" class="w-50" />
+      </div>
+      <!-- Logo  -->
+
+      <!-- Login -->
+      <div class="col-lg-4 col-md-10 col-sm-12 mx-auto bg-white p-4 mx-5 my-4 rounded-3 {% if act == "signup" %} d-none {% endif %}" id="Login">
+        <img src="{% static 'images/Logo.png' %}" class="w-25 mb-4 mx-auto  d-lg-none d-block" />
+        <h3 class="fw-bold mb-3">Sign in</h3>
+        <p class="fw-bold">New user?<a class="text-primary pe-pointer" id="createAccBtn"> Create an account</a></p>
+        <form method="POST" action="{% url 'Aspirer:Login' %}">
+        {% csrf_token  %}
+          <div class="mt-5 mb-2">
+            <input type="text" class="form-control" name="username" id="LoginUsername" placeholder="Phone Number, username, or email" value="{{username}}" required />
+          </div>
+          <div class="my-4 d-flex">
+            <input type="password" class="form-control" name="password" id="LoginPassword" placeholder="Password" required/>
+            <i class="bi bi-eye-slash ms-3 pe-pointer togglePassword"></i>
+          </div>
+          {% if error %}
+          <div class="alert alert-danger fs-6" role="alert"> Incorrect Password </div>
+          {% endif %}
+          {% if not_exist %}
+          <div class="alert alert-danger fs-6" role="alert"> Username does not exist </div>
+          {% endif %}
+          <a href="" class="fw-bold fs-6">Forgot Password?</a>
+          <button class="btn btn-primary my-4 ms-auto d-block rounded-3 btn-sm">
+            Login
+          </button>
+        </form>
+        <div class=" d-flex flex-row align-items-center justify-content-center mt-3 ">
+          <hr class="w-50 mx-3" />
+          <p>OR</p>
+          <hr class="w-50 mx-3" />
+        </div>
+        <div class="otherMedias">
+          <button class="w-75 d-block mx-auto btn-light p-2 fw-bold my-3 rounded-3"> <img class="me-2" src="https://img.icons8.com/color/20/000000/google-logo.png"/>Continue with Google</button>
+          <button class="w-75 d-block mx-auto btn-primary p-2 fw-bold my-3 rounded-3"> <i class="bi bi-facebook text-white me-2"></i> Continue with Facebook</button>
+        </div>
+      </div>
+      <!-- Login -->
+    </div>
+  </section>
+</body>
+
+<!-- JQuery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" referrerpolicy="no-referrer"></script>
+<!-- Custom JS -->
+
+<script>
+  $(".togglePassword").click(function () {
+    $(this).toggleClass("bi-eye-fill");
+    $(this).toggleClass("bi-eye-slash");
+    var t = $("#LoginPassword").attr("type");
+    if (t == "text") {
+      $("#LoginPassword").attr("type", "password");
+    }
+    else {
+      $("#LoginPassword").attr("type", "text");
+    }
+  })
+
+  $(".toggleCreatePassword").click(function () {
+    $(this).toggleClass("bi-eye-fill");
+    $(this).toggleClass("bi-eye-slash");
+    var t = $("#createPassword").attr("type");
+    if (t == "text") {
+      $("#createPassword").attr("type", "password");
+    }
+    else {
+      $("#createPassword").attr("type", "text");
+    }
+  })
+
+  $("#signInBtn").click(function () {
+    window.history.pushState({},'Sign In', "/login/");
+    document.title = `Sign In | Aspirer`;
+    $("#createAcc").addClass("d-none");
+    $("#Login").addClass("d-block");
+    $("#createAcc").removeClass("d-block");
+    $("#Login").removeClass("d-none");
+  })
+
+  $("#createAccBtn").click(function () {
+    window.history.pushState({},'Sign Up', "/signup/");
+    document.title = `Sign Up | Aspirer`;
+    $("#createAcc").removeClass("d-none");
+    $("#Login").removeClass("d-block");
+    $("#createAcc").addClass("d-block");
+    $("#Login").addClass("d-none");
+  })
+
+  function checkUsername() {
+    var username = $("#createUsername").val()
+    alert(username)
+    $.ajax({
+      method:"GET",
+      dataType:"json",
+      url:'/checkUsername/',
+      data:{
+        username : username
+      },
+      success: function(res){
+        if(res.exist){
+          $("#usernameAlert").removeClass("d-none");
+          $("#usernameAlert").addClass("d-block");
+        }
+        else{
+          $("#usernameAlert").addClass("d-none");
+          $("#usernameAlert").removeClass("d-block");
+        }
+      }
+    })
+    }
+</script>
+
+</html>

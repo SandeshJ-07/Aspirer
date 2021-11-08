@@ -1,0 +1,190 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% block title %} {{Post.user.username}} on Aspirer : {{Post.caption}} {% endblock %}
+
+{% block links %}
+
+{% endblock %}
+
+{% block content %}
+
+<!-- Main Section -->
+<div class="container px-5 py-4 mt-5">
+    <div class="row my-3 align-items-start">
+        <div class="col-lg-8">
+            <img src="{{Post.Showimage.url}}" class="w-100" />
+        </div>
+        <div class="col-lg-4 border border-start-0 px-0">
+            <div class="d-flex py-3 px-2 align-items-center border-bottom w-100">
+                <img src="{{Post.profile.ProfileImg.url}}" class="rounded-circle " width="40px" />
+                <a class="text-dark fw-bold ms-3 me-2 "
+                    href="{% url 'Aspirer:Profile' Post.user.username %}">{{Post.user.username}}</a>
+                {% if Post.user != request.user %}
+                •
+                {% if request.user.id|stringformat:"i" in Post.profile.followers %}
+                <a class="text-dark mx-3 unfollow" data-followId="{{Post.user.id}}">Following</a>
+                {% else %}
+                <a class="text-dark mx-3 unfollow" data-followId="{{Post.user.id}}">Follow</a>
+                {% endif %}
+                {% endif %}
+                <i class="bi bi-three-dots ms-auto pe-pointer" data-bs-toggle="modal" data-bs-target="#PostClickModal"></i>
+            </div>
+            <div class="d-flex w-100 align-items-start py-3 px-2">
+                <img src="{{Post.profile.ProfileImg.url}}" class="rounded-circle " width="40px" />
+                <div>
+                    <div class="d-flex align-items-center">
+                        <a class="text-dark fw-bold me-2 ms-3"
+                            href="{% url 'Aspirer:Profile' Post.user.username %}">{{Post.user.username}}</a>
+                        <p class="my-0">{{Post.caption}}</p>
+                    </div>
+                    <p class="text-secondary ms-3">{{Post.uploadTime|naturaltime}}</p>
+                    <div>
+                    </div>
+                </div>
+                </div>
+                    <!-- Comments -->
+                    <div id="comments">
+
+                    </div>
+                    <!-- Comments -->
+                    {% if not Post.archived %}
+                    <div class="d-flex px-0 mx-0 mt-100 align-items-center" style="margin-top:100%;">
+                        <i class="bi me-2 pe-pointer fs-5 likeBtn bi-heart{% if request.user.id|stringformat:'i' in Post.likes %}-fill text-danger {% endif %}" data-postId="{{Post.id}}"></i>
+                        {% if Post.allow_comments %}
+                        <i class="bi bi-chat mx-2 fs-5 pe-pointer" onclick="document.getElementById('comment').focus();"></i>
+                        {% endif %}
+                        <i class="bi bi-share mx-2 fs-5  pe-pointer"></i>
+                        <i class="bi ms-auto fs-5 pe-pointer bi-bookmark{% if Post.id|stringformat:'i' in CProfile.saved %}-fill {% endif %} saveBtn" data-postId="{{Post.id}}" id="saveBtn{{Post.id}}"></i>
+                    </div>
+                    <p style="{% if Post.archived %}margin-top:100%;{% endif %}">Liked By <span id="{{Post.id}}likes">{{Post.likes|length}}</span></p>
+                    <p class="text-secondary">{{Post.uploadTime|naturaltime}}</p>
+                    {% if Post.allow_comments %}
+                    <div class="d-flex pb-2">
+                        <i class="bi bi-emoji-smile fs-5"></i>
+                        <input type="text" id="comment" class="form-control" placeholder="Add a comment..." />
+                        <p class="pe-pointer text-primary me-2">POST</p>
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                </div>
+            
+        </div>
+        {% if otherPosts|length > 0 %}  
+        <div class="my-4">
+            <p class="text-secondary">More posts from <span class="text-dark">{{Post.user.username}}</span></p>
+        </div>
+        <div class="d-flex">
+            {% for post in otherPosts %}
+            <div>
+                <a href="{% url 'Aspirer:ViewPost' post.id %}"><img src="{{post.Showimage.url}}" width="33%" class="pe-pointer mx-3" /></a>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+<!-- Main Section -->
+
+<!-- Post Click Modal -->
+<div class="modal fade" id="PostClickModal" tabindex="-1" aria-labelledby="PostClickModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
+        <div class="modal-content py-0">
+            <div class="modal-body pb-0 my-0">
+                {% if Post.user != request.user %}
+                <p class='text-center border-bottom text-danger fw-bold py-2'>Report</p>
+                <p class='text-center border-bottom text-danger fw-bold py-2 unfollow pe-pointer'  data-followId="{{Post.user.id}}">Unfollow</p>
+                {% else %}
+                <p class='text-center border-bottom text-danger pe-pointer fw-bold py-2' id="deletePostBtn"> Delete Post</p>
+                {% if Post.archived %}
+                <p class='text-center border-bottom text-danger pe-pointer fw-bold py-2' id="archivePostBtn"> Unarchive Post</p>
+                {% else %}
+                <p class='text-center border-bottom text-danger pe-pointer fw-bold py-2' id="archivePostBtn"> Archive Post</p>
+                {% endif %}
+                {% endif %}
+                <p class='text-center border-bottom fw-bold py-2 pe-pointer' onClick="navigator.clipboard.writeText(window.location.href);" data-bs-dismiss="modal">Copy Link</p>
+                <p class='text-center border-bottom py-2 mb-0 pe-pointer fw-bold' data-bs-dismiss="modal">Cancel</p>
+            </div>
+    </div>
+</div>
+</div>
+<!-- Post Click Modal -->
+
+<!-- JQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" referrerpolicy="no-referrer"></script>
+    <script>
+        $(".likeBtn").click(function(){
+            var pid = $(this).attr("data-postId");
+            $.ajax({
+                method:"POST",
+                url:"/togglePostLike/",
+                dataType:"json",
+                data:{
+                    'pid' : pid,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success:function(res){
+                    $(this).toggleClass("text-danger");
+                    $(this).toggleClass("bi-heart");
+                    $(this).toggleClass("bi-heart-fill");
+                    var likeId = "#"+pid+"likes";
+                    $(likeId).text(res.likes);
+                }
+            })
+        })
+
+        $(".saveBtn").click(function(){
+            var pid = $(this).attr( "data-postId");
+            $.ajax({
+                method:"POST",
+                url:"/togglePostSave/",
+                dataType:"json",
+                data:{
+                    'pid':pid,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success:function(res){
+                    var btnid = "#saveBtn"+pid;
+                    $(btnid).toggleClass("bi-bookmark");
+                    $(btnid).toggleClass("bi-bookmark-fill");
+                }
+            })
+        })
+        $(".unfollow").click(function(){
+            var followId = $(this).attr("data-followId");
+            $.ajax({
+                url: "/toggleFollow/"+followId+"/",
+                type: "GET",
+                success:function(){
+                    window.location.reload();
+                }
+            });
+        })
+
+        $("#archivePostBtn").click(function(){
+            var postId = parseInt({{Post.id}});
+            $.ajax({
+                url: "/toggleArchivePost/"+postId+"/",
+                method: "GET",
+                success:function(){
+                    window.location.reload();
+                }
+            });
+        })
+        $("#deletePostBtn").click(function(){
+            var postId = {{Post.id}};
+            $.ajax({
+                url: "/deletePost/",
+                type: "POST",
+                dataType:"json",
+                data:{
+                    'pid':postId,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success:function(){
+                    window.location.href="/";
+                }
+            });
+        })
+    </script>
+{% endblock %}

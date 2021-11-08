@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block links %}
+
+{% endblock %}
+
+{% block title %}
+Upload Post
+{% endblock %}
+
+    
+{% block content %}
+ <!-- Main -->
+
+    <main class="py-5 px-3 mt-4 container">
+        <form method="POST" action="{% url 'Aspirer:UploadPost' %}" enctype="multipart/form-data">
+        {% csrf_token %} 
+        <div class="row">
+            <div class="col-md-5 col-sm-12 d-flex h-100 justify-content-center align-items-center flex-column py-5">
+              <!-- File Input -->
+              <div id="fileUploadDiv">
+              <input type="file" class="d-none" id="images" name="images" accept="image/*" multiple required oninput="preview()"/>
+              <label for="images" class="pe-pointer">
+                <i class="bi bi-plus text-primary" style="font-size:200px;"></i>
+              </label>
+            </div>
+              <!-- File Input -->
+                <!-- Caraousel -->
+                <div id="carouselExampleControls" class="carousel slide d-none" data-bs-ride="carousel" >
+                  <div class="carousel-inner" id="carouselImg">
+                    <div class="carousel-item active">
+                      <img id="activeImg" src="" class="d-block w-100" alt="..." />
+                    </div>
+                  </div>
+                  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev" >
+                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next" >
+                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Next</span>
+                </button>
+              </div>
+                <!-- Caraousel -->
+              
+            </div>
+            <div class="col-md-7 col-sm-12 my-3">
+                <p class="fs-3">New Post</p>
+                <br/>
+                <div class="mb-3">
+                <label for="caption" class="form-label">Caption</label>
+                <textarea name="caption" class="form-control fw-bold" id="caption" ></textarea>
+              </div>
+                <div class="py-5">
+                <label for="location" class="form-label">Location</label>
+                <input type="text" name="location" class="form-control fw-bold" id="location" />
+              </div>
+                <div class="py-5">
+                <input type="checkbox" name="comments" class="fw-bold" id="comments" />
+                <label for="comments" class="form-label">Allow Comments</label>
+              </div>
+
+              <button class="btn btn-primary" type="submit">Upload</button>
+            </div>
+        </div>
+    </form>
+    </main>
+
+    <!-- Main -->
+
+    
+    <!-- JQuery -->
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" referrerpolicy="no-referrer"></script>
+
+    <!-- Custom JS -->
+    <script>
+      preview = () => {
+    var file = $("#images").prop("files");
+    document.getElementById("fileUploadDiv").classList.add("d-none");
+    document.getElementById("carouselExampleControls") .classList.remove("d-none");
+    if (file[0]) {
+      var s = URL.createObjectURL(file[0]);
+      document.getElementById("activeImg").src = s;
+    }
+    var i = 1;
+    while (file[i]) {
+      var s = URL.createObjectURL(file[i]);
+      document.getElementById("carouselImg").innerHTML+= ` <div class="carousel-item">
+                  <img src=${s} class="d-block w-100" alt="..." />
+                </div>`
+      i+=1;
+    }
+  };
+    </script>
+
+{% endblock %}

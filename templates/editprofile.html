@@ -1,0 +1,333 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block links %}
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock %}
+
+{% block title %}
+{{title}}
+{% endblock %}
+
+{% block content %}
+
+ <!-- Main -->
+    <div class="row py-5">
+        <div class="col-lg-3 h-100 px-5 py-5 border-end ">
+            <a href="{% url 'Aspirer:Profile' request.user.username %}">
+                <img src="{{CProfile.ProfileImg.url}}" alt="avatar" class="rounded-circle border border-primary p-1 d-block pe-pointer my-2" width="75px">
+            </a>
+                <h2>{{request.user.first_name}} {{request.user.last_name}} </h2>
+                <p>@{{request.user.username}}</p>
+                <p>{{CProfile.bio}}</p>
+                <ul type="none" class="sidenav-list">
+                    <li data-id="editProfile" data-name="Edit Profile" {% if act == "EditProfile" %} class="active" {% endif %}>Edit Profile</li>
+                    <li data-id="changePassword" data-name="Change Password"  {% if act == "ChangePassword" %} class="active" {% endif %}>Change Password</li>
+                    <li data-id="privacy" data-name="Privacy and Security" {% if act == "PrivacyAndSecurity" %} class="active" {% endif %}>Privacy and Security</li>
+                    <li data-id="loginActivity" data-name="Login Activity" {% if act == "LoginActivity" %} class="active" {% endif %} >Login Activity</li>
+                    <li data-id="downloadData" data-name="Download Data" {% if act == "DownloadData" %} class="active" {% endif %}>Download Data</li>
+                </ul>
+        </div>
+
+
+        <!-- Edit Profile -->
+        <div class="col-lg-8 h-100 py-5 px-5 sections {% if act != "EditProfile" %} d-none {% endif %}" id="editProfile">
+            <h1>Edit Profile</h1>
+            <br/>
+            <div class="d-flex align-items-center" >
+                <img src="{{CProfile.ProfileImg.url}}" class="rounded-circle" width="75px" id="previewImageFie" />
+                <div class="mx-5">
+                    <p class="fw-bold fs-5">@sandeshJ_07</p>
+                    <form method="post" action="" id="ProfileImgForm" enctype="multipart/form-data">
+                    {% csrf_token %} 
+                        <label for="newProfileImg">
+                            <p class="my-0 btn btn-primary btn-sm" type="button">Upload New Pic </p>
+                        </label>
+                        <input type="file" id="newProfileImg" name="newProfileImg" class='d-none' oninput="previewImg()" />
+                        <button class="btn btn-primary btn-sm d-none" type="submit" name="image" id="submitImg" >Save</button>
+                    </form>
+                </div>
+            </div>
+
+            <form method="post" class="my-5 fw-bold" id="profileForm" action="{% url 'Aspirer:EditProfile' %}">  
+            {% csrf_token %}
+                <div class="row">
+                    <div class="mb-3 col-md-6 pe-5">
+                        <label for="fullname" class="form-label">Name</label>
+                        <input type="text" class="form-control p-1" id="name" name="name" placeholder="" value="{{request.user.first_name}} {{request.user.last_name}} " required>
+                    </div>
+                    <div class="mb-3 col-md-6 pe-5">
+                        <label for="email" class="form-label">Username</label>
+                        <input type="text" class="form-control p-1" id="username" name="username" placeholder="" value="{{CProfile.username}}"  required>
+                    </div>
+                </div>
+                <div class="row my-5">
+                    <div class="mb-3 col-md-6 pe-5">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" class="form-control p-1" name="email" id="email" placeholder="" value="{{CProfile.Email}}" required>
+                    </div>
+                    <div class="mb-3 col-md-6 pe-5">
+                        <label for="contact" class="form-label">Contact</label>
+                        <input type="text" class="form-control p-1" name="contact" id="contact" value="{{CProfile.contact}}" placeholder="" >
+                    </div>
+                </div>
+                <div class="mb-3 pe-5">
+                    <label for="bio" class="form-label">Bio</label>
+                    <textarea class="form-control fw-bold" id="bio" name="bio" rows=2> {{CProfile.bio}} </textarea>
+                </div>
+                <div class="pt-5 pe-5">
+                    <label for="Website" class="form-label">Website</label>
+                    <input type="text" name="website" id="website" class="form-control" value={{CProfile.website}} >
+                </div>
+                <div class="py-5 pe-5 d-flex  justify-content-between">
+                    <label for="gender" class="form-label">Gender</label>
+                    {% for g in gender %}
+                    <div><input type="radio" name="gender" class="mx-2" id="{{g.a}}" value="{{g.a}}" {% if CProfile.gender == g.a %} checked {% endif %}><label for="{{g.a}}">{{g.b}}</label></div>
+                    {% endfor %}
+                </div>
+                <button class="btn btn-primary btn-md d-block ms-auto" name="editprofileBtn" type="submit">Submit</button>
+            </form>
+        </div>
+        <!-- Edit Profile -->
+
+        <!-- Change Password -->
+        <div class="col-lg-8 h-100 py-5 px-5 sections {% if act != "ChangePassword" %} d-none {% endif %}" id="changePassword">
+            <h1>Change Password</h1>
+            <br/>
+            <form method="POST" action="{% url 'Aspirer:ChangePassword' %}">
+            {% csrf_token %}
+                <div class="my-3 row align-items-center"><label class="col-4" for="CurrPass">Current Password</label><input type="text" name="CurrPass" id="CurrPass" class="w-25 form-control col-7"></div>
+                <div class="my-3 row align-items-center"><label class="col-4" for="NewPass">New Password</label><input type="text" name="NewPass" id="NewPass" class="w-25 form-control col-7"></div>
+                <div class="my-3 row align-items-center {% if has_password == False %}d-none{% endif %}"><label class="col-4" for="rePass">Re-Enter New Password</label><input type="text" name="rePass" id="rePass" class="w-25 form-control col-7"></div>
+                <div class="alert {% if alert_flag == True %} d-block  {% else %} d-none {% endif %}  alert-danger fs-6" id="usernameAlert" role="alert"> <i class="bi bi-exclamation-circle"></i> {{msg}} </div>
+                <button type="submit" class="btn btn-primary  my-5 d-block">Save</button>
+            </form>
+        </div>
+        <!-- Change Password -->
+
+        <!-- Privacy and Securtiy -->
+        <div class="col-lg-8 h-100 p-5 sections {% if act != "PrivacyAndSecurity" %} d-none {% endif %} " id="privacy">
+            <h1>Privacy and Security</h1>
+            <br/>
+            <h4>Account Privacy</h4>
+            <div class="mt-3 fw-bold">
+                <input type="checkbox" id="accountPrivacy" class="me-2" {% if CProfile.pvt_acc %} checked {% endif %}
+                data-bs-toggle="modal" data-bs-target="#PrivacyModal" />
+                <label for="accountPrivacy">Private Account</label>
+            </div>
+            <p class="text-secondary my-3">When your account is private, only people you approve can see your photos and videos on Instagram. Your existing followers won't be affected.</p>
+            <hr/>
+            <h4>Activity Status</h4>
+            <form method="POST" class="mt-3 fw-bold">
+                <input type="checkbox" id="activityStatus" class="me-2" {% if CProfile.activity_status %} checked {% endif %} />
+                <label for="activityStatus">Show Activity Status</label>
+            </form>
+            <p class="text-secondary my-3">Allow accounts you follow and anyone you message to see when you were last active on Instagram apps. When this is turned off, you won't be able to see the activity status of other accounts.</p>
+            <hr/>
+            <h4>Story Sharing</h4>
+            <form method="POST" class="mt-3 fw-bold">
+                <input type="checkbox" id="storySharing" class="me-2" {% if CProfile.story_share %} checked {% endif %} />
+                <label for="storySharing">Allow Sharing</label>
+            </form>
+            <p class="text-secondary my-3">Let people share your story as messages</p>
+            <hr/>
+            <h4>Hide Story</h4>
+            <p data-bs-toggle="modal" data-bs-target="#HideStoryModal" class=" w-auto text-primary pe-pointer">Edit Story Settings</p>
+        </div>
+        <!-- Privacy and Securtiy -->
+
+        <!-- Login Activity -->
+        <div class="col-lg-8 h-100 p-5 sections {% if act != "LoginActivity" %} d-none {% endif %} " id="loginActivity">
+            <h1>Login Activity</h1>
+            <br/>
+            <h6 class="fw-bold">Last You Logged In:</h6>
+            <p>{{request.user.last_login}}</p>
+            <hr/>
+            <h6 class="fw-bold">You Joined On:</h6>
+            <p> {{request.user.date_joined}} </p>
+        </div>
+        <!-- Login Activity -->
+
+        <!-- Download Data -->
+        <!-- Download Data -->
+        <div class="col-lg-8 h-100 p-5 sections {% if act != "DownloadData" %} d-none {% endif %} " id="downloadData">
+            <h1>Download Data</h1>
+        </div>
+
+    </div>
+
+
+
+    <!-- Modals -->
+    <!-- Account Privacy Modal -->
+    <div class="modal fade" id="PrivacyModal" tabindex="-1" aria-labelledby="PrivacyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            
+            <div class="modal-body text-center pt-5 px-5">
+              <h5>Change Privacy?</h5>
+              <p class="text-secondary mx-3">
+                  {% if CProfile.pvt_acc %}
+                  Anyone will be able to see your photos and videos on Instagram. You will no longer need to approve followers.
+                  {% else %}
+                  Only your followers can see your photos and videos on Instagram. You will need to approve followers.
+                  {% endif %}
+              </p>
+            </div>
+            <div class="modal-footer text-center">
+                <button name="privacyBtn" id="privacyBtn" data-bs-dismiss="modal" class="btn w-100 text-primary">Okay</button>
+                <button type="button" class="btn w-100" data-bs-dismiss="modal" onclick="privacyCancel()">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>  
+    <!-- Account Privacy Modal -->
+    <!-- Hide Story Modal -->
+    <div class="modal fade" id="HideStoryModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="HideStoryLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable rounded-0">
+          <div class="modal-content rounded-0">
+            <div class="modal-header">
+              <h5 class="modal-title">Hide Story</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                {% if CProfile.hide_story|length == 0 %}
+                <p class="my-3 text-center">You can hide your stories from your followers. </p>
+                {% endif %}
+                {% for user in hidden %}
+                <div class="d-flex px-2 align-items-center border-bottom py-2">
+                    <img src="{{user.ProfileImg.url}}" width="50px" class="rounded-circle me-2"/>
+                    <div>
+                        <h6 class=" py-0 my-0 fw-bold mb-0">{{user.username}}</h6>
+                    </div>
+                    <button class="ms-auto btn btn-outline-danger">Remove</button>
+                </div>
+                {% endfor %}
+                {% if others|length != 0 %}
+                <hr/>
+                    <h6>Other Suggestions:</h6>
+                    {% for user in others %}
+                    <div class="d-flex px-2 align-items-center border-bottom py-2">
+                        <img src="{{user.ProfileImg.url}}" width="50px" class="rounded-circle me-2"/>
+                        <div>
+                            <h6 class=" py-0 my-0 fw-bold mb-0">{{user.username}}</h6>
+                        </div>
+                        <button class="ms-auto btn btn-outline-success">Hide</button>
+                    </div>
+                {% endfor %}
+                {% endif %}
+            </div>
+          
+          </div>
+        </div>
+      </div>
+    <!-- Hide Story Modal -->
+    <!-- Modals -->
+
+    <!-- Main -->
+      <!-- JQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" referrerpolicy="no-referrer"></script>
+    <!-- Custom JS  -->
+    <script>
+        window.addEventListener('popstate',function(){
+        var current = String(window.location.href).split("/")[3];
+        if(current == 'editProfile'){
+            $(".sections").addClass("d-none");
+            $("#editProfile").removeClass("d-none");
+        }
+        else if(current == 'changePassword'){
+            $(".sections").addClass("d-none");
+            $("#changePassword").removeClass("d-none");
+        }
+        else if(current == 'privacy'){
+            $(".sections").addClass("d-none");
+            $("#privacy").removeClass("d-none");
+        }
+        else if(current == 'loginActivity'){
+            $(".sections").addClass("d-none");
+            $("#loginActivity").removeClass("d-none");
+        }
+        else if(current == 'downloadData'){
+            $(".sections").addClass("d-none");
+            $("#downloadData").removeClass("d-none");
+        }
+        else{
+            $(".sections").addClass("d-none");
+            $("#editProfile").removeClass("d-none");
+        }});
+
+        $(".sidenav-list li").click(function(){
+            var title = $(this).attr('data-name');
+            document.title = title;
+            window.history.pushState(null, title, `/${$(this).attr("data-id")}/`);
+            $(".sections").addClass("d-none");
+            var id = "#" + $(this).attr("data-id");
+            $(id).removeClass("d-none");
+            $(".sidenav-list li").removeClass("active");
+            $(this).addClass("active");
+        })
+
+        function previewImg(){
+            var preview = document.getElementById('previewImageFie');
+            var file = document.querySelector('input[type=file]').files[0];
+            $("#submitImg").removeClass("d-none");
+            $("#submitImg").addClass("d-inline-block");
+            var reader = new FileReader();
+            reader.onloadend = function(){
+                preview.src = reader.result;
+            }
+            if(file){
+                reader.readAsDataURL(file);
+            }else{
+                preview.src = "";
+            }
+        }
+        
+        privacyCancel = () =>{
+            var a = document.getElementById("accountPrivacy");
+            if (a.checked == true){
+                a.checked = false;
+            }
+            else{
+                a.checked = true;
+            }
+        }
+
+        $("#privacyBtn").click(function(){
+            $.ajax({
+                method:"POST",
+                url:"/privacy/",
+                dataType:"json",
+                data:{
+                    'action':"togglePrivacy",
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+            })
+        })
+        
+        $("#activityStatus").click(function(){
+            $.ajax({
+                method:"POST",
+                url:"/privacy/",
+                dataType:"json",
+                data:{
+                    'action':"toggleActivtiy",
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+            })
+        })
+        $("#storySharing").click(function(){
+            $.ajax({
+                method:"POST",
+                url:"/privacy/",
+                dataType:"json",
+                data:{
+                    'action':"toggleStory",
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+            })
+        });
+    </script>
+
+
+{% endblock %}

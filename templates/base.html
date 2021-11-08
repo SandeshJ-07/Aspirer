@@ -1,0 +1,140 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title> {% block title %} {% endblock %} </title>
+  <link rel="shortcut icon" type="image" href="{% static 'images/Icon.png' %}" />
+  <!-- Bootstap -->
+  <link rel="stylesheet" href="{% static 'vendors/bootstrap-5.0.2-dist/css/bootstrap.min.css' %}" />
+  <script src="{% static 'vendors/bootstrap-5.0.2-dist/js/bootstrap.min.js' %}"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.6.1/font/bootstrap-icons.css" />
+  <!-- Bootstap -->
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{% static 'css/base.css' %}" />
+  {% block links %} {% endblock %}
+  <!-- Custom CSS -->
+</head>
+<body>
+    {% if navbar %}
+    <!-- Navbar -->
+     <nav class="navbar navbar-expand-md navbar-light bg-light position-fixed top-0 w-100 mb-5" style="z-index:100;"> 
+        <div class="container">
+          <a class="navbar-brand font-1" href="{% url 'Aspirer:Home' %}"> Aspirer </a>
+          <div class="d-sm-none d-sm-block"><i class="bi bi-chat"></i></div>
+          <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <form class="mx-auto d-flex bg-transparent">
+                <input class="form-control bg-transparent" type="search" placeholder="Search">
+            </form>
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+              <li class="nav-item"></li>
+                <a class="nav-link {% if active == "home" %}active{% endif %} " aria-current="page" href="{% url 'Aspirer:Home' %}"><i class="bi bi-house-door{% if active == "home" %}-fill{% endif %} fs-5"></i></a>
+              </li>
+              <li class="nav-item"></li>
+                <a class="nav-link {% if active == "chat" %}active{% endif %}" href="#"><i class="bi bi-chat{% if active == "chat" %}-fill{% endif %} fs-5"></i></a>
+              </li>
+              <li class="nav-item"></li>
+                <a class="nav-link {% if active == "upload" %}active{% endif %}" href="{% url 'Aspirer:UploadPost' %}"><i class="bi bi-plus-square{% if active == "upload" %}-fill{% endif %} fs-5"></i></a>
+              </li>
+              <li class="nav-item"></li>
+                <a class="nav-link {% if active == "explore" %}active{% endif %}" href="{% url 'Aspirer:Explore' %}"><i class="bi bi-compass{% if active == "explore" %}-fill{% endif %} fs-5"></i></a>
+              </li>
+              <li class="nav-item"></li>
+                <a class="nav-link {% if active == "follow" %}active{% endif %}" href="#"  data-bs-toggle="modal" data-bs-target="#FollowRequestModal"><i class="bi bi-heart{% if active == "follow" %}-fill{% endif %} fs-5"></i></a>
+              </li>
+              <div class="dropdown">
+                <button class="btn dropdown-btn dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="bi bi-person{% if active == "profile" %}-fill {% else %} text-secondary {% endif %} fs-5"></i>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                  <li><a class="dropdown-item fw-bold" href="{% url 'Aspirer:Profile' request.user.username %}">Profile</a></li>
+                  <li><a class="dropdown-item fw-bold" href="{% url 'Aspirer:EditProfile' %}">Settings</a></li>
+                  <li><a class="dropdown-item fw-bold" href="#">Saved</a></li>
+                  <li><a class="dropdown-item fw-bold" href="{% url 'Aspirer:Logout' %}">Logout</a></li>
+                </ul>
+              </div>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    <!-- Navbar -->
+
+    <!-- Small Devices Navbar - Bottom -->
+        <div class="d-flex d-md-none bg-white position-fixed bottom-0 p-2 w-100  justify-content-around">
+            <div><a href="{% url 'Aspirer:Home' %}"><i class="bi bi-house-door{% if active == "home" %}-fill{% endif %}"></i></a></div>
+            <div class="chatIcon"><i class="bi bi-chat{% if active == "chat" %}-fill{% endif %}"></i></div>
+            <div><a href="{% url 'Aspirer:UploadPost' %}"><i class="bi bi-plus-square{% if active == "upload" %}-fill{% endif %}"></i></a></div>
+            <div> <a href="{% url 'Aspirer:Explore' %}"> <i class="bi bi-compass{% if active == "explore" %}-fill{% endif %}"></i></a></div>
+            <div><i class="bi bi-heart" data-bs-toggle="modal" data-bs-target="#FollowRequestModal"></i></div>
+            <div><a href="{% url 'Aspirer:Profile' request.user.username %}"><i class="bi bi-person{% if active == "profile" %}-fill{% endif %}"></i></a></div>
+        </div>
+    <!-- Small Device Navbar -->
+    {% endif %}
+
+    {%  block content %} {% endblock %}
+
+    {% if navbar %}
+    <!-- Follow Request Modal -->
+    <div class="modal fade" id="FollowRequestModal" tabindex="-1" aria-labelledby="FollowRequestModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="FollowRequestModalLabel">Follow Requests</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          {% if Request_Users|length != 0 %}
+            {% for req in Request_Users %}
+            <div class="d-flex align-items-center border-bottom py-2" id="request{{forloop.counter}}">
+              <img src="{{ req.P.ProfileImg.url }}" alt="avatar" class="me-3" width="50px">
+            <div>
+              <a href="{% url 'Aspirer:Profile' req.P.username %}"><p class="my-0 py-0 fw-bold">{{req.P.username}}</p></a>
+              <p class="text-secondary">{{req.U.first_name}} {{req.U.last_name}}</p>
+            </div>
+              <button class="btn btn-primary btn-sm ms-auto handleRequestBtn" data-cardid="request{{forloop.counter}}" data-action = 'Accept' data-id="{{req.P.user.id}}" >Accept</button>
+              <button class="btn btn-outline-danger ms-2 btn-sm handleRequestBtn" data-cardid="request{{forloop.counter}}" data-action = 'Reject' data-id="{{req.P.user.id}}" >Delete</button>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p class="text-center"> No Follow Requests </p>
+        {% endif %}
+        </div>
+    </div>
+    </div>
+    </div>
+    <!-- Follow Request Modal -->
+    {% endif %}
+
+    <!-- JQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" referrerpolicy="no-referrer"></script>
+    <!-- Handle Follow Requests -->
+    <script>
+    var i = {{Request_Users|length}};
+    $(".handleRequestBtn").click(function(){
+            var action = $(this).attr("data-action");
+            var id = $(this).attr("data-id");
+            $.ajax({
+              url : '/handleFollowRequest/',
+              dataType: 'json',
+              data:{
+                  'action':action,
+                  'id' : id,
+                  csrfmiddlewaretoken: '{{ csrf_token }}'
+              },
+              method:"POST",
+              success: function(res){
+                i-=1;
+                if(i == 0){
+                  $("#FollowRequestModal").modal("hide");
+                }
+                var cardId = "#" + $(this).attr("data-cardid");
+                $(cardId).addClass("d-none");
+              }
+            })
+        })
+    </script>
+</body>
+</html>

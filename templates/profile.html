@@ -1,0 +1,327 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block links %}
+<link rel="stylesheet" href="{% static 'css/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+  <!-- Main -->
+    <div class="row my-5">
+        <!-- Profile Bar -->
+        <div class="col-lg-3 py-3 ps-5 bg-white h-100 start-0 border-end mh-100">
+            <div class="">
+            {% if RUser == request.user %}
+            <div class="w-100 d-flex justify-content-end">
+                <a href="{% url 'Aspirer:EditProfile' %}" class="text-dark">
+                <i class="bi bi-pencil-square pe-pointer mx-3"></i>
+            </a>
+            <a href="{% url 'Aspirer:Logout' %}">
+                <i class="bi bi-door-open-fill pe-pointer me-0" ></i>
+                </a>
+            </div>
+            {% endif %}
+                            {% if RUser.id|stringformat:"i" in CProfile.follow_request %}
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                <div>
+                    <b>{{RProfile.username}}</b> has requested to follow you !
+                    <div>
+                    <p class="btn btn-sm btn-primary my-2 handleRequestBtn" data-action = 'Accept' >Accept</p>
+                    <p class="btn btn-sm btn-outline-danger my-2 handleRequestBtn" data-action = "Reject">Decline</p>
+                    </div>
+                       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" id="alertDismiss"></button>
+</div>
+
+                </div>
+                {% endif %}
+
+                <img src="{{RProfile.ProfileImg.url}}" alt="avatar" class="rounded-circle p-1 d-block pe-pointer my-2" width="75px">
+                <h2>{{RUser.first_name}} {{ RUser.last_name}} </h2>
+                <p>@{{RUser.username}}</p>
+                <p> {{RProfile.bio}} </p>
+                <br/>
+                {% if RUser != request.user %}
+                <div class="d-flex justify-content-between">
+                    {% if request.user.id|stringformat:"i" in RProfile.followers %}
+                    <p class="requestBtn btn btn-primary btn-sm">Unfollow</p>
+                    {% elif request.user.id|stringformat:"i" in RProfile.follow_request  %}
+                    <p class="requestBtn btn btn-outline-primary btn-sm">Requested</p>
+                    {% else %}
+                    <p class="requestBtn btn btn-primary btn-sm">Follow</p>
+                    {% endif %}
+                    </div>
+                {% endif %}
+                <div class='d-flex flex-column my-4' >
+                <div class="d-flex NavBtns" data-id="Posts">
+                    <i class="bi bi-card-image me-3"></i>
+                    <p><span class="fw-bold">{{Posts|length}}</span> posts</p>
+                </div>
+                <div class="d-flex NavBtns" data-id="Followers">
+                    <i class="bi bi-person-check-fill me-3"></i>
+                    <p><span class="fw-bold">{{RProfile.followers|length}}</span> followers</p>
+                </div>
+                <div class="d-flex NavBtns" data-id="followings">
+                    <i class="bi bi-person-rolodex me-3"></i>
+                    <p><span class="fw-bold" id="followingNumber">{{RProfile.following|length}}</span> followings</p>
+                </div>
+            </div>
+            </div>
+        </div>
+        <!-- Profile Bar -->
+
+        <!-- View Section -->
+        {% if CUser == RUser or CUser.id|stringformat:"i" in RProfile.followers or not RProfile.pvt_acc %}
+        <!-- Post Section -->
+        <div class="col-lg-9 px-5 pt-5 border-end scrollVSec sections" id="Posts">
+            <div class="d-flex w-100 justify-content-around">
+                <a class="fw-bold pe-pointer postSectionsBtn" data-id="PostPost">
+                    Posts
+                </a>
+                <a class="pe-pointer postSectionsBtn">
+                    Tagged
+                </a>
+                {% if RUser == CUser %}
+                <a class="pe-pointer postSectionsBtn" data-id="PostArchived">
+                    Archived
+                </a>
+                <a class="pe-pointer postSectionsBtn">
+                    Saved
+                </a>
+                {% endif %}
+            </div>
+            <!-- Posts -->
+            <div class="d-flex w-100 flex-wrap scrollVSec postSections" id="PostPost">
+            {% if Posts|length == 0 %}
+            <div class="justify-content-center align-items-center row py-5">
+            {% if RUser == CUser %}
+            <div class="col-6">
+            <img  src="https://www.instagram.com/static/images/mediaUpsell.jpg/6efc710a1d5a.jpg" height="400px" />
+            </div>
+            <div class="col-6 align-items-center text-center">
+            <h4>Start capturing and sharing your moments.</h4>
+            <a href="{% url 'Aspirer:UploadPost' %}"><button class="btn btn-primary btn-sm">Upload</button></a>
+            </div>
+            {% else %}
+            <div class="col-12">
+            <img  src="https://www.instagram.com/static/images/mediaUpsell.jpg/6efc710a1d5a.jpg" height="400px" class="mb-5" />
+            <h4 class="text-seconday fw-bold"> {{RUser.username}} has not uploaded any picture yet. </h4>
+            </div>
+            {% endif %} 
+            </div>
+            {% endif %}
+            {% for post in Posts %}
+                <div class="mt-4 pe-pointer mx-2">
+                    <a href="{% url 'Aspirer:ViewPost' post.id %}"><img src="{{post.Showimage.url}}" alt="" width="300px"></a>
+                    <div class="d-flex py-1 justify-content-around">
+                    <div>
+                    {{post.likes|length}}
+                    <i class="bi bi-heart-fill text-danger ms-1 me-3"></i>
+                    </div><div>
+                    {{post.comments|length}}
+                    <i class="bi bi-chat-fill text-dark ms-1 me-3"></i>
+                    </div><div>
+                    {{post.saved}}
+                    <i class="bi bi-bookmark-fill text-dark ms-1 me-3"></i>
+                    </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <!-- Posts -->
+            
+            {% if RUser == CUser %}
+            <!-- Archived -->
+                  <div class="d-flex w-100 flex-wrap scrollVSec postSections d-none" id="PostArchived">
+            {% if archived|length == 0 %}
+            <div class="justify-content-center align-items-center row py-5">
+                <div class="col-6">
+                    <img  src="https://www.instagram.com/static/images/mediaUpsell.jpg/6efc710a1d5a.jpg" height="400px" />
+                </div>
+                <div class="col-6 align-items-center text-center">
+                    <h4>Start capturing and sharing your moments.</h4>
+                    <a href="{% url 'Aspirer:UploadPost' %}"><button class="btn btn-primary btn-sm">Upload</button></a>
+                </div>
+            </div>
+            {% endif %}
+            {% for post in archived %}
+                <div class="mt-4 pe-pointer mx-2">
+                    <a href="{% url 'Aspirer:ViewPost' post.id %}"><img src="{{post.Showimage.url}}" alt="" width="300px"></a>
+                        <div class="d-flex py-1 justify-content-around">
+                    <div>
+                    {{post.likes|length}}
+                    <i class="bi bi-heart-fill text-danger ms-1 me-3"></i>
+                    </div><div>
+                    {{post.comments|length}}
+                    <i class="bi bi-chat-fill text-dark ms-1 me-3"></i>
+                    </div><div>
+                    {{post.saved}}
+                    <i class="bi bi-bookmark-fill text-dark ms-1 me-3"></i>
+                    </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <!-- Archived -->
+            {% endif %}
+        </div>
+        <!-- Post Section -->
+        <!-- Followers -->
+        <div class="col-lg-9 p-5 sections d-none" id="Followers">
+            <p class="fw-bold align-items-baseline"><span class="fs-3">Followers</span> | {{RProfile.followers|length}}</p>
+            <div class="d-flex flex-wrap">
+            {% if followers|length  == 0 %}
+            <h4 class="text-center text-secondary"> There are no followers ! </h4>
+            {% endif %}
+            {% for follower in followers %}
+                <div class="text-center shadow-sm m-3 pb-2">
+                    <img src="{{follower.ProfileImg.url}}" alt="avatar" class="rounded-circle pe-pointer m-2" width="75px">
+                    <a href="{% url 'Aspirer:Profile' follower.username %}"><p class="my-0 fw-bold">{{follower.username}}</p></a>
+                    {% if RUser == CUser %}
+                    <button class="btn btn-outline-danger btn-sm my-3 removeFollower" data-userId="{{follower.user.id}}"> Remove </button>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            </div>
+        </div>
+        <!-- Followers -->
+        <!-- Following -->
+        <div class="col-lg-9 p-5 sections d-none" id="followings">
+            <p class="fw-bold align-items-baseline"><span class="fs-3">Followings</span> | {{RProfile.following|length}}</p>
+            <div class="d-flex flex-wrap ">
+            {% if followings|length == 0 %}
+                <h4 class="text-center text-secondary"> You have not followed anyone ! </h4>
+            {% endif %}
+            {% for following in followings %}
+            <div class="text-center shadow-sm m-3" id="following{{forloop.counter}}">
+                    <img src="{{following.ProfileImg.url}}" alt="avatar" class="rounded-circle pe-pointer m-2" width="75px">
+                    <a href="{% url 'Aspirer:Profile' following.username %}"><p class="my-0 fw-bold">{{following.username}}</p></a>
+                    {% if RUser == CUser %}
+                    <button class="btn btn-outline-danger btn-sm my-3 requestBtn" data-cardId="following{{forloop.counter}}" data-userId="{{following.user.id}}"> Unfollow </button>
+                    {% endif %}
+            </div>
+            {% endfor %}
+            </div>
+            {% if suggestions|length != 0 %}
+            <h5 class="mt-5 fw-bold"> Suggestions : </h4>
+            <div class="d-flex flex-wrap p-3">
+            {% for suggest in suggestions %}
+            <div class="px-4 shadow text-center py-2">
+                <img src="{{suggest.ProfileImg.url}}" alt="avatar" class="rounded-circle pe-pointer m-2" width="75px">
+                <a href="{% url 'Aspirer:Profile' suggest.username %}"><p class="my-0 fw-bold">{{suggest}}</p></a>
+                {% if request.user.id|stringformat:"i" in suggest.follow_request %}
+                <button class="btn btn-sm btn-primary mt-3 mb-2 requestBtn" data-userId = {{suggest.user.id}}> Requested </button>
+                {% else %}
+                <button class="btn btn-sm btn-primary mt-3 mb-2 requestBtn" data-userId = {{suggest.user.id}}> Follow </button>
+                {% endif %}
+            </div>
+            {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        <!-- Following -->
+
+        {% else %}
+        <!-- For Others -->
+        <div class="col-lg-9 p-5">
+            <div class='d-felx justify-content-center align-items-center text-center'>
+                <i class="d-block bi bi-shield-lock-fill text-secondary" style="font-size:150px;"></i>
+                <h1>Account's Private</h1>
+                <h3>Follow to get updates</h3>
+                {% if request.user.id|stringformat:"i" in RProfile.followers %}
+                    <p class="requestBtn btn btn-primary btn-sm my-4">Unfollow</p>
+                {% elif request.user.id|stringformat:"i" in RProfile.follow_request  %}
+                    <p class="requestBtn btn btn-outline-primary btn-sm my-4">Requested</p>
+                {% else %}
+                    <p class="requestBtn btn btn-primary btn-sm my-4">Follow</p>
+                {% endif %}
+            </div>
+        </div>
+        <!-- For Others -->
+        {% endif %}
+        <!-- View Section -->
+        <!-- Suggestions -->
+
+        </div>
+        <!-- Suggestions -->
+    </div>
+    <!-- Main -->
+
+ <!-- JQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" referrerpolicy="no-referrer"></script>
+     <!-- Custom JS -->
+    <script>
+    {% if RUser.id == CUser.id or CUser.id|stringformat:"i" in RProfile.followers %}
+        $(".NavBtns").addClass("pe-pointer");
+        $(".NavBtns").click(function(){
+            var id = "#"+$(this).attr("data-id");
+            $(".sections").addClass("d-none");
+            $(id).removeClass("d-none");
+        })
+    {% endif %}
+        $(".requestBtn").click(function(){
+            if($(this).attr('data-userId')){
+                var id = parseInt($(this).attr('data-userId'));
+            }
+            else{
+                var id = parseInt({{RUser.id}});
+            }
+            $.ajax({
+                url : '/toggleFollow/'+ id +'/',
+                method:"GET",
+                success:function(data){
+                    if($(this).attr('data-userId')){
+                        $(this).text(res.data);
+                    }
+                    else{
+                    $(".requestBtn").text(data.text);}
+                    if(status=="Unfollow"){
+                        window.location.reload();
+                    }
+                }
+            })
+        })
+        $(".handleRequestBtn").click(function(){
+            var action = $(this).attr("data-action");
+            var id = parseInt({{RUser.id}});
+            $.ajax({
+              url : '/handleFollowRequest/',
+              dataType: 'json',
+              data:{
+                  'action':action,
+                  'id' : id,
+                  csrfmiddlewaretoken: '{{ csrf_token }}'
+              },
+              method:"POST",
+              success: function(res){
+                  if(res.data == 'Accept'){
+                    $("#alertDismiss").click();
+                    $("followingNumber").html(parseInt($("followingNumber").html())+1);
+                  }
+              }
+            })
+        })
+
+        $(".removeFollower").click(function(){
+            var id = parseInt($(this).attr("data-userId"));
+            $.ajax({
+                url:'/removeFollower/'+id+'/',
+                method:"GET",
+                success:function(res){
+                    if(res.data == "success"){
+                        var cardId = $(this).attr("data-cardId");
+                        $("#data-cardId").addClass("d-none");
+                    }
+                }
+            })
+        })
+
+        $(".postSectionsBtn").click(function(){
+            $('.postSectionsBtn').removeClass("fw-bold");
+            $(this).addClass("fw-bold");
+            $(".postSections").addClass("d-none");
+            var id = "#"+$(this).attr("data-id");
+            $(id).removeClass("d-none");
+        })
+    </script>
+
+{% endblock %}

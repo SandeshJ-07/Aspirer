@@ -1,0 +1,306 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% block title %} Home {% endblock %}
+
+{% block links %} 
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- Main Section -->
+    <div class="container px-lg-5 px-sm-0 mt-5 mb-3">
+        <div class="row">
+            <div class="col-lg-9">
+                <!-- Stories -->
+                <div class="d-flex align-items-center mt-3 mb-4 p-2">
+                {% if userStory == 0 %}
+                    <div>
+                        <div style="height:75px; width:75px;" class="bg-primary rounded-circle me-3 d-flex align-items-center justify-content-center pe-pointer"  data-bs-toggle="modal" data-bs-target="#UploadStoryModal">
+                            <i class="bi bi-plus fs-1 text-white"></i>
+                        </div>
+                    </div>
+                {% else %}
+                    <div>
+                        <img src="{{CProfile.ProfileImg.url}}" alt="avatar" class="rounded-circle border border-primary p-1 me-3 pe-pointer modalOpenStory" data-story-user = "{{CProfile.user.id}}" data-story-name = "{{CProfile.username}}" data-bs-toggle="modal" data-bs-target="#ViewStoryModal"  width="75px">
+                    </div>
+                {% endif %}
+                {% for s in stories %}
+                <div class="otherStory">
+                  <img
+                  width="75px"
+                  src="{{s.RProfile.ProfileImg.url}}"
+                  class="border {% if request.user.id|stringformat:"i" in s.stories.views %} border-secondary {% else %}{% if s.stories.type == "p" %} border-primary {% else %}border-success{% endif %}{% endif %} rounded-circle mx-2 pe-pointer p-1 modalOpenStory"
+                  data-story-name = {{s.RProfile.username}}
+                  data-story-user = "{{s.RProfile.user.id}}"
+                  data-bs-toggle="modal"
+                  data-bs-target="#ViewStoryModal"
+                />
+                </div>
+                {% endfor %}
+                </div>
+                <!-- Stories -->
+                <!-- Posts -->
+                <div clas="w-100">
+                    <!-- Post 1 -->
+                    {% for post in posts %}
+                    <div class="post shadow  my-3 py-3 px-2">
+                        <div class="d-flex ps-1 align-items-center pb-3">
+                            <img src="{{post.post.profile.ProfileImg.url}}" alt="avatar" class="rounded-circle"  width="30px" heigth="25px">
+                            <a class="text-dark" href="{% url 'Aspirer:Profile' post.post.user.username  %}"><p class="fw-bold my-0 ms-2 pe-pointer">{{post.post.user.username}}</p></a>
+                            <i class="bi bi-three-dots-vertical ms-auto me-2 pe-pointer postModalBi" onClick="$('#postUrl').attr('href','{% url 'Aspirer:ViewPost' post.post.id %}');" data-user-id="{{post.post.user.id}}" post-id="{{post.post.id}}" data-bs-toggle="modal" data-bs-target ="#PostClickModal"></i>
+                        </div>  
+                        <img src="{{ post.post.Showimage.url }}" alt="avatar" class="mx-auto d-block w-100 pe-pointer">
+                        <div class="d-flex align-items-center my-2">
+                            <i class="bi mx-2 pe-pointer bi-heart{% if request.user.id|stringformat:'i' in post.post.likes %}-fill text-danger {% endif %} likeBtn" data-postId = "{{post.id}}" id="likeBtn{{post.id}}" ></i>
+                        {% if post.post.allow_comments %}
+                            <i class="bi bi-chat mx-2 pe-pointer commentBi" data-commentId =  "comment{{post.post.id}}"></i>
+                            {% endif %}
+                            <i class="bi bi-share mx-2  pe-pointer"></i>
+                            <i class="bi ms-auto pe-pointer bi-bookmark{% if post.post.id|stringformat:'i' in CProfile.saved %}-fill {% endif %} saveBtn" data-postId="{{post.id}}" id="saveBtn{{post.id}}"></i>
+                        </div>  
+                        
+                        <span class="">Liked by <span id="{{post.post.id}}likes">{{post.post.likes|length}}</span></span>
+                        
+                        <div class="d-flex my-2">
+                        <a class="text-dark" href="{% url 'Aspirer:Profile' post.post.user.username %}"><span class="fw-bold me-2">{{post.post.user.username}}</span></a>
+                        <span> {{post.post.caption}}</span>
+                    </div>
+                    <!-- Comments -->
+                    <div id="commentsPost{{post.post.id}}">
+                        <div class="comment d-flex">
+                            <p class='fw-bold me-2 my-0'>{{post.comments.0.User}}</p>
+                            <p class="my-0">{{post.comments.0.content}}</p>
+                        </div>
+                        <div class="comment d-flex my-0">
+                            <p class='fw-bold me-2 my-0'>{{post.comments.1.User}}</p>
+                            <p class="my-0">{{post.comments.1.content}}</p>
+                        </div>
+                    </div>
+                    <!-- Comments -->
+                        <span class="text-secondary fs-6"> {{post.post.uploadTime|naturaltime}} </span>
+                        {% if post.post.allow_comments %}
+                        <div  class="d-flex py-2">
+                            <i class="bi bi-emoji-smile fs-5"></i>
+                            <input type="text" class="form-control commentText" id="comment{{post.post.id}}" post-id="{{post.post.id}}" placeholder="Add a comment..." />
+                            <p class="text-primary pe-pointer me-2 postComment" cid="comment{{post.post.id}}">POST</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                    <!-- Post 1 -->
+                </div>
+                <!-- Posts -->
+            </div>
+            <div class="col-lg-2 d-flex">
+                <div class="position-fixed pt-3">
+                <img src="{{CProfile.ProfileImg.url}}" width="75px" class="rounded-circle my-3">
+                <h2> {{request.user.first_name}} {{request.user.last_name}} </h2>
+                <p>@{{request.user.username}}</p>
+            </div>  
+            </div>
+        </div>
+    </div>
+<!-- Main Section -->
+
+
+<!-- Post Click Modal -->
+  <div class="modal fade" id="PostClickModal" tabindex="-1" aria-labelledby="PostClickModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
+            <div class="modal-content py-0">
+                <div class="modal-body pb-0 my-0">
+                    <p class='text-center border-bottom text-danger fw-bold py-2'>Report</p>
+                    <p class='text-center border-bottom text-danger fw-bold py-2 unfollow pe-pointer' id="followId" data-followId="">Unfollow</p>
+                    <a id="postUrl"><p class='text-center border-bottom fw-bold py-2'>Go to post</p></a>
+                    <p class='text-center border-bottom py-2 mb-0 pe-pointer fw-bold' data-bs-dismiss="modal">Cancel</p>
+                </div>
+        </div>
+    </div>
+  </div>
+<!-- Post Click Modal -->
+
+
+<!-- Upload Story Modal -->
+<div class="modal fade" id="UploadStoryModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Upload Story</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div id="modalBodyForm">
+          <form enctype='multipart/form-data' method="POST" action="{% url 'Aspirer:UploadStory' %}" id="storyUploadForm" >
+            {% csrf_token %}
+            <label for="picUpload" class="w-100 text-center py-3 pe-pointer">
+              <div class="text-primary my-4 pe-pointer">
+                <i class="fas fa-plus fa-7x"></i>
+              </div>
+              <div class="fs-5 fw-bold">Upload Image</div>
+            </label>
+            <input type="file" id="picUpload" name="picUpload" accept="image/*" oninput="preview()" class="d-none" required/>
+          </form>
+        </div>
+        <div id="preview" class="d-flex justify-content-center">
+          <img src=" " style="max-height: 300px" id="previewImg" class="d-none" />
+        </div>
+      </div>
+      <div class="modal-footer">
+      <input type="checkbox" form="storyUploadForm" name="typeStory" id="typeStory"/>
+      <label for="typeStory" class="me-auto">Close Friends</label>
+        <button type="submit" form="storyUploadForm" id="storySubmit" class="btn btn-primary" disabled >
+          Upload Story
+        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="closeModal()" >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Upload Story Modal -->
+
+<!-- View Story Modal-->
+<div class="modal fade" id="ViewStoryModal" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true" >
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+      <div class="modal-header">
+                  <h5 class="modal-title story-upload-user" id="getCroppedCanvasTitle">{{CProfile.user}}</h5>
+                  <button type="button" class="btn close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+        <div class="modal-body">
+            <div id="storyViewSection"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+    <!-- View Story Modal-->
+
+<!-- JQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" referrerpolicy="no-referrer"></script>
+    <script>
+        preview = () => {
+            $("#modalBodyForm").addClass("d-none");
+            $("#previewImg").removeClass("d-none");
+            $("#previewImg").addClass("d-block");
+            $("#storySubmit").attr("disabled", false);
+            var input = document.getElementById("picUpload");
+            var file = input.files;
+            if (file[0]) {
+                $("#previewImg").attr("src", URL.createObjectURL(file[0]));
+            }
+        };
+        
+        closeModal = () => {
+            $("#modalBodyForm").removeClass("d-none");
+            $("#previewImg").addClass("d-none");
+            $("#previewImg").removeClass("d-block");
+            $("#storySubmit").attr("disabled", true);
+            var input = document.getElementById("picUpload");
+            input.src = "";
+        
+        };
+        $(".postModalBi").click(function(){
+            var id = $(this).attr("data-user-id");
+            $("#followId").attr("data-followId",$(this).attr("data-user-id"));
+        })
+
+        $(".unfollow").click(function(){
+            var followId = $(this).attr("data-followId");
+            $.ajax({
+                url: "/toggleFollow/"+followId+"/",
+                type: "GET",
+                success:function(){
+                    $("#PostClickModal").modal("hide");
+                }
+            });
+        });
+
+        $(".likeBtn").click(function(){
+            var pid = $(this).attr("data-postid");
+            $.ajax({
+                method:"POST",
+                url:"/togglePostLike/",
+                dataType:"json",
+                data:{
+                    'pid' : pid,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success:function(res){
+                    var btnid = "#likeBtn"+pid;
+                    $(btnid).toggleClass("text-danger");
+                    $(btnid).toggleClass("bi-heart");
+                    $(btnid).toggleClass("bi-heart-fill");
+                    var likeId = "#"+pid+"likes";
+                    $(likeId).text(res.likes);
+                }
+            })
+        })
+
+        $(".saveBtn").click(function(){
+            var pid = $(this).attr( "data-postId");
+            $.ajax({
+                method:"POST",
+                url:"/togglePostSave/",
+                dataType:"json",
+                data:{
+                    'pid':pid,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success:function(res){
+                    var btnid = "#saveBtn"+pid;
+                    $(btnid).toggleClass("bi-bookmark");
+                    $(btnid).toggleClass("bi-bookmark-fill");
+                }
+            })
+        })
+        $(".postComment").click(function(){
+            var tid ="#"+$(this).attr("cid");
+            var content = String($(tid).val());
+            var pid = parseInt($(tid).attr("post-id"));
+            if(content.trim() != " "){
+            $.ajax({
+                method:"POST",
+                url:"/postComment/",
+                dataType:"json",
+                data:{
+                    'pid':pid,
+                    'comment':content,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success:function(res){   
+                    $(tid).val(' ');
+                    if(res.clength < 2){
+                        var cid = "#commentsPost"+pid;
+                        $(cid).append("<div class='comment d-flex'><p class='fw-bold me-2'>"+res.comment.User+"</p><p>"+res.comment.content+"</p></div>");
+                    }
+                }
+            })}
+        })
+
+        $(".commentBi").click(function(){
+            var id = "#"+$(this).attr("data-commentId");
+            $(id).focus();
+        })
+
+        $(".modalOpenStory").click(function(){
+            var uid = $(this).attr("data-story-user");
+            var name = $(this).attr("data-story-name");
+            $(this).removeClass("border-primary");
+            $(this).removeClass("border-success");
+            $(this).addClass("border-secondary");
+            $(".story-upload-user").html(name)
+            $.ajax({
+                url: "/GetStory/"+ uid +"/",
+                method:"GET",
+                success: function (res) {
+                    $("#storyViewSection").html(res.data);
+                },
+            });
+        });
+
+    </script>
+{% endblock %}
