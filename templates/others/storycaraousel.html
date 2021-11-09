@@ -35,9 +35,9 @@
   {% endif %}
 </div>
 {% if CProfile == UserProfile %}
-<div class="me-auto my-2">
+<div class="me-auto my-2 d-flex">
 <i class="bi bi-eye-fill"></i> {{stories.0.views|length}}</div>
-<button class="my-2 mx-auto d-block btn btn-outline-danger deleteBtn" id="deleteBtnId" onclick="deleteStory()" data-story-id ={{stories.0.id}}>Delete</button>
+<button class="ms-auto d-block btn btn-danger btn-sm deleteBtn" id="deleteBtnId" onclick="deleteStory()" data-story-id ={{stories.0.id}}>Delete</button>
 {% endif %}
 </div>
 

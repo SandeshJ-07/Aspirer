@@ -98,7 +98,6 @@ def Home(request):
     stories = []
     for i in CProfile.following:
         P1 = Story.objects.filter(User__id = i)
-        print(P1)
         if P1.exists():
             P = P1[0]
             RProfile = Profile.objects.filter(user = i)[0]
@@ -107,7 +106,6 @@ def Home(request):
             if P.type == "c" and str(request.user.id) not in RProfile.close_friends:
                 continue
             stories.append({"user":i, "stories":P,"RProfile":RProfile}) 
-    print(stories)
     dic = {"posts":posts, "active":"home", "CProfile":CProfile, "userStory":userStory, "stories":stories}
     return render(request,'home.html',dic)
 

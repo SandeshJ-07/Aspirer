@@ -14,6 +14,9 @@ urlpatterns = [
     path('logout/',Logout, name="Logout"),
     path("explore/",Explore, name="Explore"),
     path("profile/<str:username>/",ProfileView, name="Profile"),
+    path("profile/<str:username>/archived/",ProfileView, name="Profile"),
+    path("profile/<str:username>/saved/",ProfileView, name="Profile"),
+    path("profile/<str:username>/tagged/",ProfileView, name="Profile"),
 
     # eidtProile Urls
     path("editProfile/",EditProfile, name="EditProfile"),

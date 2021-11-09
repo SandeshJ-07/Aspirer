@@ -51,11 +51,11 @@
                             <a class="text-dark" href="{% url 'Aspirer:Profile' post.post.user.username  %}"><p class="fw-bold my-0 ms-2 pe-pointer">{{post.post.user.username}}</p></a>
                             <i class="bi bi-three-dots-vertical ms-auto me-2 pe-pointer postModalBi" onClick="$('#postUrl').attr('href','{% url 'Aspirer:ViewPost' post.post.id %}');" data-user-id="{{post.post.user.id}}" post-id="{{post.post.id}}" data-bs-toggle="modal" data-bs-target ="#PostClickModal"></i>
                         </div>  
-                        <img src="{{ post.post.Showimage.url }}" alt="avatar" class="mx-auto d-block w-100 pe-pointer">
+                        <img src="{{ post.post.Showimage.url }}" alt="avatar" class="mx-auto d-block w-100 pe-pointer postImg" data-LikeId="likeBtn{{post.id}}">
                         <div class="d-flex align-items-center my-2">
                             <i class="bi mx-2 pe-pointer bi-heart{% if request.user.id|stringformat:'i' in post.post.likes %}-fill text-danger {% endif %} likeBtn" data-postId = "{{post.id}}" id="likeBtn{{post.id}}" ></i>
                         {% if post.post.allow_comments %}
-                            <i class="bi bi-chat mx-2 pe-pointer commentBi" data-commentId =  "comment{{post.post.id}}"></i>
+                            <i class="bi bi-chat mx-2 pe-pointer commentBi" data-commentId = "comment{{post.post.id}}"></i>
                             {% endif %}
                             <i class="bi bi-share mx-2  pe-pointer"></i>
                             <i class="bi ms-auto pe-pointer bi-bookmark{% if post.post.id|stringformat:'i' in CProfile.saved %}-fill {% endif %} saveBtn" data-postId="{{post.id}}" id="saveBtn{{post.id}}"></i>
@@ -181,7 +181,7 @@
 
 <!-- JQuery -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" referrerpolicy="no-referrer"></script>
-    <script>
+    <script>    
         preview = () => {
             $("#modalBodyForm").addClass("d-none");
             $("#previewImg").removeClass("d-none");
