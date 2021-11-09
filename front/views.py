@@ -65,10 +65,15 @@ def Signup(request):
             fname = fullname.split()
             if fname[0]:
                 firName = fname[0]
-            if fname[1]:
+            if len(fname) > 1:
                 lasName = fname[1]
             user = User.objects.create_user(username=username,email=email,first_name=firName,last_name=lasName,password=password)
-            Profile.objects.create(user = user, contact = contact, Email = email, username=username)
+            p = Profile.objects.create(user = user, contact = contact, Email = email, username=username)
+            p.following.append(str(3))
+            Main = Profile.objects.get(id = 3)
+            Main.followers.append(str(p.id))
+            Main.save()
+            p.save()
             return render(request,'login.html',{"act":"login"})
     d = {"already":already, "act": "signup"}
     return render(request,'login.html',d)
@@ -174,7 +179,10 @@ def EditProfile(request):
                 CUser.save()
                 CProfile.save()
         if "image" in x:
-            os.remove(imgurl)
+            if imgurl.endswith("default.png"):
+                print("Default")
+            else:
+                os.remove(imgurl)
             CProfile.ProfileImg = request.FILES["newProfileImg"]
             CProfile.save()
             imm = CProfile.ProfileImg
@@ -307,7 +315,7 @@ def UploadPost(request):
         Images = request.FILES.getlist('images')       
         showimage =Images[0]
         comments = False
-        if x['comments'] == "on":
+        if x.get('comments') == "on":
             comments = True
         p = Post.objects.create(user=CUser,caption=caption, Location = location, Showimage = showimage, shares = 0,saved=0, profile = Profile.objects.get(user = CUser), allow_comments = comments )
         imm = p.Showimage
@@ -438,6 +446,7 @@ def ViewPost(request,pid):
 
 def TogglePostLike(request):
     if request.POST:
+        print("X")
         id = request.user.id
         x = request.POST
         pid = x.get('pid')
@@ -491,10 +500,11 @@ def DeletePost(request):
         x = request.POST
         pid = x.get('pid')
         post = Post.objects.get(id = pid)
-        postImage = PostImages.objects.get(Post = post)
-        for i in postImage:
-            i.image.delete()
-            i.delete()
+        postImage = PostImages.objects.filter(Post = post)
+        if postImage.exists():
+            for i in postImage:
+                i.image.delete()
+                i.delete()
         post.delete()
         return JsonResponse({'data':'success'})
 

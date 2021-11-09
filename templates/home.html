@@ -51,9 +51,9 @@
                             <a class="text-dark" href="{% url 'Aspirer:Profile' post.post.user.username  %}"><p class="fw-bold my-0 ms-2 pe-pointer">{{post.post.user.username}}</p></a>
                             <i class="bi bi-three-dots-vertical ms-auto me-2 pe-pointer postModalBi" onClick="$('#postUrl').attr('href','{% url 'Aspirer:ViewPost' post.post.id %}');" data-user-id="{{post.post.user.id}}" post-id="{{post.post.id}}" data-bs-toggle="modal" data-bs-target ="#PostClickModal"></i>
                         </div>  
-                        <img src="{{ post.post.Showimage.url }}" alt="avatar" class="mx-auto d-block w-100 pe-pointer postImg" data-LikeId="likeBtn{{post.id}}">
+                        <img src="{{ post.post.Showimage.url }}" alt="avatar" class="mx-auto d-block w-100 pe-pointer postImg" data-LikeId="likeBtn{{post.post.id}}">
                         <div class="d-flex align-items-center my-2">
-                            <i class="bi mx-2 pe-pointer bi-heart{% if request.user.id|stringformat:'i' in post.post.likes %}-fill text-danger {% endif %} likeBtn" data-postId = "{{post.id}}" id="likeBtn{{post.id}}" ></i>
+                            <i class="bi mx-2 pe-pointer bi-heart{% if request.user.id|stringformat:'i' in post.post.likes %}-fill text-danger {% endif %} likeBtn" data-postId="{{post.post.id}}" id="likeBtn{{post.post.id}}" ></i>
                         {% if post.post.allow_comments %}
                             <i class="bi bi-chat mx-2 pe-pointer commentBi" data-commentId = "comment{{post.post.id}}"></i>
                             {% endif %}
@@ -220,7 +220,7 @@
         });
 
         $(".likeBtn").click(function(){
-            var pid = $(this).attr("data-postid");
+            var pid = $(this).attr("data-postId");
             $.ajax({
                 method:"POST",
                 url:"/togglePostLike/",

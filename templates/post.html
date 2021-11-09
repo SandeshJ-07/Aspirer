@@ -30,15 +30,15 @@
                 {% endif %}
                 <i class="bi bi-three-dots ms-auto pe-pointer" data-bs-toggle="modal" data-bs-target="#PostClickModal"></i>
             </div>
-            <div class="d-flex w-100 align-items-start py-3 px-2">
+            <div class="d-flex w-100 align-items-start py-3 pe-2">
                 <img src="{{Post.profile.ProfileImg.url}}" class="rounded-circle " width="40px" />
                 <div>
                     <div class="d-flex align-items-center">
                         <a class="text-dark fw-bold me-2 ms-3"
                             href="{% url 'Aspirer:Profile' Post.user.username %}">{{Post.user.username}}</a>
-                        <p class="my-0">{{Post.caption}}</p>
                     </div>
-                    <p class="text-secondary ms-3">{{Post.uploadTime|naturaltime}}</p>
+                    <p class="mt-2 ms-3">{{Post.caption}}</p>
+                    <p class="text-secondary">{{Post.uploadTime|naturaltime}}</p>
                     <div>
                     </div>
                 </div>
@@ -49,7 +49,7 @@
                     </div>
                     <!-- Comments -->
                     {% if not Post.archived %}
-                    <div class="d-flex px-0 mx-0 mt-100 align-items-center" style="margin-top:100%;">
+                    <div class="d-flex px-0 mx-0 mt-100 align-items-center" style="margin-top:80%;">
                         <i class="bi me-2 pe-pointer fs-5 likeBtn bi-heart{% if request.user.id|stringformat:'i' in Post.likes %}-fill text-danger {% endif %}" data-postId="{{Post.id}}"></i>
                         {% if Post.allow_comments %}
                         <i class="bi bi-chat mx-2 fs-5 pe-pointer" onclick="document.getElementById('comment').focus();"></i>
@@ -57,7 +57,7 @@
                         <i class="bi bi-share mx-2 fs-5  pe-pointer"></i>
                         <i class="bi ms-auto fs-5 pe-pointer bi-bookmark{% if Post.id|stringformat:'i' in CProfile.saved %}-fill {% endif %} saveBtn" data-postId="{{Post.id}}" id="saveBtn{{Post.id}}"></i>
                     </div>
-                    <p style="{% if Post.archived %}margin-top:100%;{% endif %}">Liked By <span id="{{Post.id}}likes">{{Post.likes|length}}</span></p>
+                    <p class="mt-4" style="{% if Post.archived %}margin-top:100%;{% endif %}">Liked By <span id="{{Post.id}}likes">{{Post.likes|length}}</span></p>
                     <p class="text-secondary">{{Post.uploadTime|naturaltime}}</p>
                     {% if Post.allow_comments %}
                     <div class="d-flex pb-2">
