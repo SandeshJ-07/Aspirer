@@ -15,7 +15,7 @@ class Profile(models.Model):
 
 
     # Fields
-    user = models.OneToOneField(User,on_delete=models.CASCADE)
+    user = models.OneToOneField(User,on_delete=models.CASCADE, unique=True)
     username = models.CharField(null=False, default = " ", max_length = 20)
     ProfileImg = models.ImageField(null=True,upload_to="images/profile_pic/",default="media/images/profile_pic/default.png")
     contact = models.CharField(max_length = 10)
@@ -176,3 +176,21 @@ class Story(models.Model):
         blank = True
     )
     shares = models.IntegerField(default = 0)
+
+# Chatroom Models
+Msgstatus =(
+    ('seen','seen'),
+    ('delivered','delivered'),
+    ('sending','sending')
+)
+
+class ChatRoom(models.Model):
+    Users = models.ManyToManyField(User)
+    name = models.CharField(max_length  = 25, default =" Chatroom", blank=False)
+
+class ChatMsg(models.Model):
+    Chatroom = models.ForeignKey(ChatRoom,on_delete=models.CASCADE)
+    sender = models.ForeignKey(User,on_delete=models.CASCADE)
+    status = models.CharField(max_length = 10 , choices=Msgstatus, default="sending")
+    sendTime = models.DateTimeField(default= datetime.datetime.now())
+    content = models.TextField(null=False, blank=False, max_length=6000)

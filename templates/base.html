@@ -24,7 +24,7 @@
      <nav class="navbar navbar-expand-md navbar-light bg-light position-fixed top-0 w-100 mb-5" style="z-index:100;"> 
         <div class="container">
           <a class="navbar-brand font-1" href="{% url 'Aspirer:Home' %}"> Aspirer </a>
-          <div class="d-sm-none d-sm-block"><i class="bi bi-chat"></i></div>
+          <div class="d-sm-none d-sm-block"><a  href="{% url 'Aspirer:Chatroom' %}"><i class="bi bi-chat{% if active == "chat" %}-fill{% endif %}"></i></a></div>
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <form class="mx-auto d-flex bg-transparent">
                 <input class="form-control bg-transparent" type="search" placeholder="Search">
@@ -34,7 +34,7 @@
                 <a class="nav-link {% if active == "home" %}active{% endif %} " aria-current="page" href="{% url 'Aspirer:Home' %}"><i class="bi bi-house-door{% if active == "home" %}-fill{% endif %} fs-5"></i></a>
               </li>
               <li class="nav-item"></li>
-                <a class="nav-link {% if active == "chat" %}active{% endif %}" href="#"><i class="bi bi-chat{% if active == "chat" %}-fill{% endif %} fs-5"></i></a>
+                <a class="nav-link {% if active == "chat" %}active{% endif %}" href="{% url 'Aspirer:Chatroom' %}"><i class="bi bi-chat{% if active == "chat" %}-fill{% endif %} fs-5"></i></a>
               </li>
               <li class="nav-item"></li>
                 <a class="nav-link {% if active == "upload" %}active{% endif %}" href="{% url 'Aspirer:UploadPost' %}"><i class="bi bi-plus-square{% if active == "upload" %}-fill{% endif %} fs-5"></i></a>
@@ -136,5 +136,6 @@
             })
         })
     </script>
+    {% block scripts %}{% endblock %}
 </body>
 </html>

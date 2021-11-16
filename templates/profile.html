@@ -11,16 +11,17 @@
         <!-- Profile Bar -->
         <div class="col-lg-3 py-3 ps-5 bg-white h-100 start-0 border-end mh-100">
             <div class="">
-            {% if RUser == request.user %}
             <div class="w-100 d-flex justify-content-end">
+                <i class="bi bi-gear-fill pe-pointer" data-bs-toggle="modal" data-bs-target="#{% if RUser == CUser  %}UserMoreOptions{% else %}MoreOptions{% endif %}"}></i>
+            {% if RUser == request.user %}
                 <a href="{% url 'Aspirer:EditProfile' %}" class="text-dark">
                 <i class="bi bi-pencil-square pe-pointer mx-3"></i>
             </a>
             <a href="{% url 'Aspirer:Logout' %}">
                 <i class="bi bi-door-open-fill pe-pointer me-0" ></i>
                 </a>
-            </div>
             {% endif %}
+            </div>
                             {% if RUser.id|stringformat:"i" in CProfile.follow_request %}
                 <div class="alert alert-info alert-dismissible fade show" role="alert">
                 <div>
@@ -77,9 +78,6 @@
                 <a class="fw-bold pe-pointer postSectionsBtn" data-id="PostPost">
                     Posts
                 </a>
-                <a class="pe-pointer postSectionsBtn">
-                    Tagged
-                </a>
                 {% if RUser == CUser %}
                 <a class="pe-pointer postSectionsBtn" data-id="PostArchived">
                     Archived
@@ -116,10 +114,11 @@
                     <div>
                     {{post.likes|length}}
                     <i class="bi bi-heart-fill text-danger ms-1 me-3"></i>
-                    </div><div>
+                    </div>
+                    {% if post.allow_comments %}<div>
                     {{post.comments|length}}
                     <i class="bi bi-chat-fill text-dark ms-1 me-3"></i>
-                    </div><div>
+                    </div>{% endif %}<div>
                     {{post.saved}}
                     <i class="bi bi-bookmark-fill text-dark ms-1 me-3"></i>
                     </div>
@@ -245,6 +244,168 @@
         <!-- Suggestions -->
     </div>
     <!-- Main -->
+
+
+
+<!-- User More Options -->
+<div
+  class="modal fade my-5 rounded "
+  id="UserMoreOptions"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-footer text-center p-0 rounded">
+        <button
+          type="button"
+          class="btn w-100 border px-0 m-0 py-2"
+          onclick="window.location.href='/changePassword'"
+        >
+          Change Password
+        </button>
+        <button type="button" class="btn w-100 border px-0 m-0 py-2">
+          NameTag
+        </button>        
+        <button
+          type="button"
+          class="btn w-100 border px-0 m-0 py-2"
+          onclick="window.location.href='/privacy/'"
+        >
+          Privacy and Security
+        </button>
+        <button
+          type="button"
+          class="btn w-100 border px-0 py-2 m-0"
+          onclick="window.location.href='/loginActivity'"
+        >
+          Login Activity
+        </button>
+        <button
+          type="button"
+          class="btn w-100 border px-0 py-2 m-0"
+          onclick="window.location.href='/logout'"
+        >
+          Log Out
+        </button>
+        <button type="button" class="btn w-100" data-bs-dismiss="modal">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- User More Options -->
+
+
+<!-- Other User More Options -->
+<div
+  class="modal fade my-5 rounded "
+  id="MoreOptions"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-footer text-center p-0 rounded">
+        {% if RUser.id|stringformat:"i" not in CProfile.blocked_users %}
+        <a class="text-decoration-none mx-auto my-0 w-100"><button
+          type="button"
+          class="btn w-100 border px-0 m-0 py-2 text-danger fw-bold"
+          data-bs-dismiss="modal"
+          data-bs-toggle="modal"
+          data-bs-target="#blockModal"
+        >
+          Block this user
+        </button>
+      </a>
+      {% if RUser.id|stringformat:"i" not in CProfile.restricted_users %}
+        <button type="button" class="btn w-100 border px-0 m-0 py-2  text-danger fw-bold"
+        data-bs-dismiss="modal"
+          data-bs-toggle="modal"
+          data-bs-target="#restrictModal">
+          Restrict
+        </button>
+        {% else %}
+        <a class="text-decoration-none mx-auto w-100" href="{% url 'Aspirer:ToggleRestrictUser' RUser.id %}"><button type="button" class="btn w-100 border px-0 m-0 py-2  text-danger fw-bold">
+          Unrestrict
+        </button></a>
+        {% endif %}
+        {% else %}
+        <a class="text-decoration-none mx-auto w-100" href="{% url 'Aspirer:ToggleBlockUser' RUser.id %}"><button
+          type="button"
+          class="btn w-100 border px-0 m-0 py-2 text-danger fw-bold"
+        >
+          Unblock this user
+        </button>
+        {% endif %}
+        <button type="button" class="btn w-100 border px-0 m-0 py-2  text-danger fw-bold">
+          Report User
+        </button>
+        <button type="button" class="btn w-100" data-bs-dismiss="modal">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Other User More Options -->
+
+
+<!-- Block Modal -->
+<div class="modal fade" id="blockModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      
+      <div class="modal-body text-center pt-5 px-5">
+        <h5>Block {{ RProfile.username }}?</h5>
+        <p class="text-secondary mx-3">
+          They won't be able to find your profile, posts or story on Instagram. We won't let them know you blocked them.
+        </p>
+      </div>
+      <div class="modal-footer text-center">
+          <a  href="{% url 'Aspirer:ToggleBlockUser' RUser.id %}" class="w-100"><button type="submit" class="btn w-100 text-primary">Block</button></a>
+          <button type="button" class="btn w-100" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>  
+<!-- Block Modal -->
+
+<!-- Restrict Modal -->
+<div class="modal fade" id="restrictModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      
+      <div class="modal-body text-center pt-5 px-5">
+        <h5>Are you having a problem with {{ RProfile.username }}?</h5>
+        <p class="text-secondary mx-3">
+          <div class="d-flex text-start">
+            <i class="fas fa-shield-alt fa-2x pt-2"></i>
+            <p class="text-secondary ms-3">Limit unwanted interactions without having to block or unfollow someone you know.</p>
+          </div>
+          <div class="d-flex  text-start">
+            <i class="far fa-comments fa-2x me-3 pt-2"></i>
+            <p class="text-secondary">You'll control if others can see their new comments on your posts.</p>
+          </div>
+          <div class="d-flex text-start">
+            <i class="fa fa-paper-plane fa-2x me-3 pt-2"></i>
+            <p class="text-secondary">Their chat will be moved to your Message Requests, so they won't see when you've read it.</p>
+          </div>
+        </p>
+      </div>
+      <div class="modal-footer text-center my-0 py-0">
+        <a class="text-decoration-none mx-auto w-100" href="{% url 'Aspirer:ToggleRestrictUser' RUser.id %}"><button type="button" class="btn w-100 border px-0 m-0 py-2  text-danger fw-bold">
+          Restrict
+        </button></a>
+          <button type="button" class="btn w-100" data-bs-dismiss="modal" onclick="privacyCancel()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>  
+<!-- Restrict Modal -->
 
  <!-- JQuery -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" referrerpolicy="no-referrer"></script>

@@ -39,11 +39,19 @@ urlpatterns = [
     path("GetStory/<int:id>/",GetStory,name="GetStory"),
     path('deleteStory/', DeleteStory1, name="DeleteStory"),
 
+    # Chatroom
+    path('chatroom/',Chatroom, name="Chatroom"),
+    path("openChat/",OpenChat,name="OpenChat" ),
+    path("sendMessage/",SendMessage,name="SendMessage" ),
+    path("sentMessage/",MessageSent,name="MessageSent"),
+
     # Other Utils Urls
     path("checkUsername/",CheckUsername, name="checkUsername"),
     path("toggleFollow/<int:userId>/",ToggleFollow, name="ToggleFollow"),
     path("removeFollower/<int:userId>/",removeFollower, name="RemoveFollower"),
     path('handleFollowRequest/',HandleFollowRequest, name="HandleRequest"),
+    path('toggleBlockUser/<int:uid>/',ToggleBlockUser, name="ToggleBlockUser"),
+    path('toggleRestrictUser/<int:uid>/',ToggleRestrictUser, name="ToggleRestrictUser"),
 ]
 
 if settings.DEBUG:

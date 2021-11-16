@@ -22,6 +22,7 @@ from pathlib import Path
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',include('front.urls')),
+    path('api/',include('api.urls')),
 ] 
 
 if settings.DEBUG:

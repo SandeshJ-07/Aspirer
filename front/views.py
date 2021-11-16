@@ -428,6 +428,31 @@ def HandleFollowRequest(request):
         RProfile.save()
         return JsonResponse({'data':action})
 
+def ToggleBlockUser(request,uid):
+    if request.POST:
+        id = uid
+        CProfile = Profile.objects.get(user = request.user)
+        if str(id) in CProfile.blocked_users:
+            CProfile.blocked_users.remove(str(id))
+            text='Unblocked'
+        else:
+            CProfile.blocked_users.append(str(id))
+            text='Blocked'
+        CProfile.save()
+        return JsonResponse({'data':text})
+
+def ToggleRestrictUser(request,uid):
+    if request.POST:
+        id=uid
+        CProfile = Profile.objects.get(user = request.user)
+        if str(id) in CProfile.restricted_users:
+            CProfile.restricted_users.remove(str(id))
+            text="Unrestricted"
+        else:
+            CProfile.restricted_users.append(str(id))
+            text = 'Restricted'
+        CProfile.save()
+        return JsonResponse({"data":text})
 
 # Post Views
 def ViewPost(request,pid):
@@ -556,3 +581,75 @@ def DeleteStory1(request):
         P.Image.delete()
         P.delete()
     return redirect("Aspirer:Home")
+
+
+# Chatroo mViews
+def Chatroom(request):
+    CProfile = Profile.objects.get(user = request.user)
+    CUser =   CProfile.user
+    SuggestedProfiles = Profile.objects.all()
+    suggestions = []
+    for i in SuggestedProfiles:
+        if (not(i.pvt_acc) or str(i.user.id) in CProfile.followers or str(i.user.id) in CProfile.following):
+            suggestions.append(i)
+    
+    dic = {"title":"ChatRoom", "CProfile":CProfile, "CUser":CUser, "suggestions":suggestions, "active":"chat"}
+    return render(request,'chatroom.html', dic)
+
+@csrf_exempt
+def OpenChat(request):
+    if request.POST:
+        User1 = request.POST.get('user1')
+        User2 = request.POST.get('user2')
+        Users = [int(User1), int(User2)]
+        for i in Users:
+            c = User.objects.filter(id = i)
+        users_len = len(set(Users))
+        c = ChatRoom.objects.annotate(
+            total_Users=Count('Users'),
+            matching_Users=Count('Users', filter=Q(Users__in=Users))
+        ).filter(
+            matching_Users=users_len,
+            total_Users=users_len
+        )
+        if c.exists():
+            c1 = c[0]
+        if not c.exists():
+            # Create Chatroom Code
+            c1 = ChatRoom()
+            c1.save()
+            for i in Users:
+                u = User.objects.get(id = int(i))
+                c1.Users.add(u)
+            c1.save()
+        CProfile = Profile.objects.get(user = request.user)
+        SuggestedProfiles = Profile.objects.all()
+        CUser = request.user
+        suggestions = []
+        for i in SuggestedProfiles:
+            if (not(i.pvt_acc) or str(i.user.id) in CProfile.followers or str(i.user.id) in CProfile.following):
+                suggestions.append(i)
+
+        Chats = ChatMsg.objects.filter(Chatroom = c1)
+        f = render_to_string('others/chat.html',{'Chats':Chats,'CUser':CUser})
+        return JsonResponse({'data':f, "cid":c1.id,'ChatE':Chats.exists()})        
+
+@csrf_exempt
+def SendMessage(request):
+    if request.POST:
+        content = request.POST.get("content")
+        chatroom_id = request.POST.get("chatroom")
+        chatroom = ChatRoom.objects.get(id = chatroom_id)
+        chat = ChatMsg.objects.create(content = content, Chatroom = chatroom, status = "sending", sender = request.user)
+        Chats = ChatMsg.objects.filter(Chatroom = chatroom_id)
+        f = render_to_string('others/chat.html',{'Chats':Chats,'CUser':request.user})
+        return JsonResponse({'data':f,'ChatE':Chats.exists(), "c_id":chat.id})       
+
+@csrf_exempt
+def MessageSent(request):
+    if request.POST:
+        id = request.POST.get('id')
+        Chat = ChatMsg.objects.get(id = id)
+        Chat.status = "delivered"
+        Chat.save()
+        return JsonResponse({"data":True})

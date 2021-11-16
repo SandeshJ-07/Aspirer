@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+{% load static %]
+
+{% block title %}
+{{title}}
+{% endblock %}
+
+{% block content %}
+
+<!-- Main -->
+<div class="row pt-5 mt-4 px-5" style="height:92vh;">
+    <div class="col-lg-3 col-lg-md-3 px-4 py-3 border">
+        <div class="d-flex align-items-center mx-0 pb-3 px-0 border-bottom">
+            <img src="{{CProfile.ProfileImg.url}}" width="40px" class="rounded-circle me-2"/>
+            <p class="fw-bold my-0">{{CProfile.username}}</p>
+            <i class="ms-auto bi bi-caret-down-fill"></i>
+            <i class="ms-2 pe-pointer bi bi-pencil-square"></i>
+        </div>
+        <div class="mt-4">
+            <p class="fw-bold fs-6">Suggestions:</p>
+            {% for suggest in suggestions %}
+            <div class="d-flex align-items-center my-3 pe-pointer chatClick" data-user ="{{suggest.user.id}}" data-img="{{suggest.ProfileImg.url}}" data-username="{{suggest.username}}" >
+                <img src="{{suggest.ProfileImg.url}}" width="40px" class="rounded-circle me-2" />
+                <p class="fw-bold my-0">{{suggest.username}}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+     <div class="col-lg-9 d-flex flex-column border border-start-0 justify-content-center text-center" id="InitialMsg">
+            <i class="bi bi-telegram" style="font-size:200px;"></i>
+            <p class="fs-4">Start Messaging !</p>
+    </div>
+    <div class="col-lg-9 px-4 py-3 border border-start-0 d-none" id="ChatboxMain">
+        <div class="d-flex align-items-center mx-0 pb-3 px-0 border-bottom">
+            <img src="" width="40px" class="rounded-circle me-2" id="ChatUserImg" />
+            <p class="fw-bold my-0" id="headerUsername">{{CProfile.username}}</p>
+            <i class="ms-auto bi bi-info-circle fs-5 pe-pointer"></i>
+        </div>
+        <!-- Chat Section -->
+        <div class="py-3 align-items-end d-flex flex-column" style="min-height:80%;" id='ChatSection'>
+        </div>
+        <div id="StartMsg" class=" d-flex fs-1 justify-content-center" style="height:80%;"><p class="my-auto">Start Messaging</p></div>
+        
+        <!-- Chat Section -->
+        <div class="d-flex w-100" id="MsgBox" >
+            <i class="bi bi-emoji-smile fs-5 me-3"></i>
+            <input type="text" id="MessageChatBox" class="form-control" placeholder="Type a message..."/>
+            <i class="bi bi-paperclip fs-5"></i>
+        </div>
+        
+    </div>
+   
+</div>
+<!-- Main -->
+
+
+{% endblock %}
+
+{% block scripts %}
+<!-- JQuery -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" referrerpolicy="no-referrer"></script>
+<!-- Custom Script -->
+<script>
+$(".chatClick").click(function(){
+    var id = $(this).attr("data-user");
+    Users = [];
+    Users[0] = id;
+    Users[1] = {{request.user.id}};
+
+    var src = $(this).attr("data-img");
+    var username = $(this).attr("data-username");
+    $("#ChatUserImg").attr("src",src);
+    $("#headerUsername").html(username);
+    $.ajax({
+      type:"POST",
+      dataType: "json",
+      url:"/openChat/",
+      data:{
+        user1 : Users[0],
+        user2 : Users[1],
+      },
+      success: function(res){
+        $("#InitialMsg").addClass("d-none");
+        $("#ChatboxMain").removeClass("d-none");
+        $("#MsgBox").attr("data-cid",res.cid);
+        if(res.ChatE){
+          $("#ChatSection").html(res.data);
+          $("#StartMsg").addClass("d-none");
+          $("#StartMsg").removeClass("d-flex");
+          $("#ChatSection").addClass("d-flex");
+          $("#ChatSection").removeClass("d-none");
+        }else{
+          $("#StartMsg").removeClass("d-none");
+          $("#StartMsg").addClass("d-flex");
+          $("#ChatSection").addClass("d-none");
+          $("#ChatSection").removeClass("d-flex");
+        }
+      },
+    });
+  })
+
+  $("#MessageChatBox").keyup(function(event) {
+    if (event.keyCode === 13) {
+     var content = $(this).val();
+     var chatroom = $("#MsgBox").attr("data-cid");
+     $(this).val(" ");
+     $.ajax({
+       type:"POST",
+       url:"/sendMessage/",
+       dataType : "json",
+       data :{
+         content: content,
+         chatroom : chatroom,
+       },
+        success: function(res){
+        $("#InitialMsg").addClass("d-none");
+        $("#ChatboxMain").removeClass("d-none");
+        if(res.ChatE){
+          $("#ChatSection").html(res.data);
+          $("#StartMsg").addClass("d-none");
+          $("#StartMsg").removeClass("d-flex");
+          $("#ChatSection").addClass("d-flex");
+          $("#ChatSection").removeClass("d-none");
+        }else{
+          $("#StartMsg").removeClass("d-none");
+          $("#StartMsg").addClass("d-flex");
+          $("#ChatSection").addClass("d-none");
+          $("#ChatSection").removeClass("d-flex");
+        }
+        $.ajax({
+          type:"POST",
+          url:"/sentMessage/",
+          dataType:"json",
+          data:{
+            id : res.c_id,
+          },
+        })
+      },
+     })
+    }
+});
+
+</script>  
+
+{% endblock %}
