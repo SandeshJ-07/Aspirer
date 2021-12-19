@@ -1,1 +1,1 @@
-web: gunicorn aspirer.aspirer.wsgi --log-file -
+web: gunicorn aspirer.wsgi --log-file -
