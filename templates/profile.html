@@ -82,7 +82,7 @@
                 <a class="pe-pointer postSectionsBtn" data-id="PostArchived">
                     Archived
                 </a>
-                <a class="pe-pointer postSectionsBtn">
+                <a class="pe-pointer postSectionsBtn" data-id="PostSaved">
                     Saved
                 </a>
                 {% endif %}
@@ -161,6 +161,33 @@
                 {% endfor %}
             </div>
             <!-- Archived -->
+            <!-- Saved -->
+            <div class="d-flex w-100 flex-wrap scrollVSec postSections d-none" id="PostSaved">
+              {% if saved|length == 0 %}
+              <div class="justify-content-center align-items-center py-5">
+                <h1>No Saved Post!</h1>
+                <h3>Start Saving Your Favourites.</h3>
+              </div>
+              {% endif %}
+              {% for post in saved %}
+                  <div class="mt-4 pe-pointer mx-2">
+                      <a href="{% url 'Aspirer:ViewPost' post.id %}"><img src="{{post.Showimage.url}}" alt="" width="300px"></a>
+                          <div class="d-flex py-1 justify-content-around">
+                      <div>
+                      {{post.likes|length}}
+                      <i class="bi bi-heart-fill text-danger ms-1 me-3"></i>
+                      </div><div>
+                      {{post.comments|length}}
+                      <i class="bi bi-chat-fill text-dark ms-1 me-3"></i>
+                      </div><div>
+                      {{post.saved}}
+                      <i class="bi bi-bookmark-fill text-dark ms-1 me-3"></i>
+                      </div>
+                      </div>
+                  </div>
+                  {% endfor %}
+              </div>
+            <!-- Saved -->
             {% endif %}
         </div>
         <!-- Post Section -->
@@ -440,7 +467,7 @@
                     }
                 }
             })
-        })
+        });
         $(".handleRequestBtn").click(function(){
             var action = $(this).attr("data-action");
             var id = parseInt({{RUser.id}});
@@ -460,7 +487,7 @@
                   }
               }
             })
-        })
+        });
 
         $(".removeFollower").click(function(){
             var id = parseInt($(this).attr("data-userId"));

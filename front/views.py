@@ -111,7 +111,7 @@ def Home(request):
             if P.type == "c" and str(request.user.id) not in RProfile.close_friends:
                 continue
             stories.append({"user":i, "stories":P,"RProfile":RProfile}) 
-    dic = {"posts":posts, "active":"home", "CProfile":CProfile, "userStory":userStory, "stories":stories}
+    dic = {"posts":posts, "active":"home", "CProfile":CProfile, "userStory":userStory, "stories":stories,"followReqL":len(CProfile.follow_request)}
     return render(request,'home.html',dic)
 
 def Explore(request):
@@ -133,6 +133,7 @@ def ProfileView(request,username):
     followers = []
     suggestion = []
     followings = []
+    saved = Post.objects.filter(id__in = CProfile.saved)
     archived = Post.objects.filter(user = RUser, archived = True) 
     for i in RProfile.followers:
         followers.append(Profile.objects.get(user__id = i))
@@ -144,7 +145,7 @@ def ProfileView(request,username):
         if i.user != RUser and i not in followings:
                 suggestion.append(i)
 
-    dic = {"active":"profile", "CUser": CUser,"RUser":RUser, "CProfile":CProfile, "RProfile":RProfile, "Posts":Posts, "followers":followers, "followings":followings, "suggestions":suggestion, "archived":archived}
+    dic = {"active":"profile", "CUser": CUser,"RUser":RUser, "CProfile":CProfile, "RProfile":RProfile, "Posts":Posts, "followers":followers, "followings":followings, "suggestions":suggestion, "archived":archived,"saved":saved}
     return render(request,'profile.html',dic)
 
 @login_required(login_url='/login/')

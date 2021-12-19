@@ -8,7 +8,7 @@
 {% block content %}
 
 <!-- Main -->
-<div class="row pt-5 mt-4 px-5" style="height:92vh;">
+<div class="row py-5 mt-4 px-5" style="height:92vh;">
     <div class="col-lg-3 col-lg-md-3 px-4 py-3 border">
         <div class="d-flex align-items-center mx-0 pb-3 px-0 border-bottom">
             <img src="{{CProfile.ProfileImg.url}}" width="40px" class="rounded-circle me-2"/>
@@ -16,7 +16,7 @@
             <i class="ms-auto bi bi-caret-down-fill"></i>
             <i class="ms-2 pe-pointer bi bi-pencil-square"></i>
         </div>
-        <div class="mt-4">
+        <div class="mt-4 d-md-block d-none">
             <p class="fw-bold fs-6">Suggestions:</p>
             {% for suggest in suggestions %}
             <div class="d-flex align-items-center my-3 pe-pointer chatClick" data-user ="{{suggest.user.id}}" data-img="{{suggest.ProfileImg.url}}" data-username="{{suggest.username}}" >
@@ -26,7 +26,7 @@
             {% endfor %}
         </div>
     </div>
-     <div class="col-lg-9 d-flex flex-column border border-start-0 justify-content-center text-center" id="InitialMsg">
+     <div class="col-lg-9 d-flex flex-column border border-start-0 mb-sm-5 pb-sm-5 justify-content-center text-center" id="InitialMsg">
             <i class="bi bi-telegram" style="font-size:200px;"></i>
             <p class="fs-4">Start Messaging !</p>
     </div>

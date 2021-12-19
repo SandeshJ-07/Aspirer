@@ -58,7 +58,7 @@
                             <i class="bi bi-chat mx-2 pe-pointer commentBi" data-commentId = "comment{{post.post.id}}"></i>
                             {% endif %}
                             <i class="bi bi-share mx-2  pe-pointer"></i>
-                            <i class="bi ms-auto pe-pointer bi-bookmark{% if post.post.id|stringformat:'i' in CProfile.saved %}-fill {% endif %} saveBtn" data-postId="{{post.id}}" id="saveBtn{{post.id}}"></i>
+                            <i class="bi ms-auto pe-pointer bi-bookmark{% if post.post.id|stringformat:'i' in CProfile.saved %}-fill {% endif %} saveBtn" data-postId="{{post.post.id}}" id="saveBtn{{post.post.id}}"></i>
                         </div>  
                         
                         <span class="">Liked by <span id="{{post.post.id}}likes">{{post.post.likes|length}}</span></span>
@@ -302,5 +302,6 @@
             });
         });
 
+        
     </script>
 {% endblock %}
