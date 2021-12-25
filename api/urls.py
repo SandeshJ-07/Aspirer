@@ -5,7 +5,13 @@ from .views import *
 
 router = DefaultRouter()
 router.register('profiles', ProfileViewSet, basename="profile")
+router.register("posts",PostViewSet, basename="post")
+router.register("postimages",PostImagesViewSet, basename="postimages")
+router.register("comments",CommentViewSet, basename="comment")
+router.register("stories",StoryViewSet, basename="story")
+router.register("chatrooms",ChatRoomViewSet, basename="chatroom")
+router.register("chatmsgs",ChatMsgViewSet, basename="chatmsg")
 
 urlpatterns = [
-     path("profileapi",include(router.urls)),
+     path("",include(router.urls)),
 ]
